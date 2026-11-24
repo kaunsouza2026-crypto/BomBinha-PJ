@@ -1595,6 +1595,7 @@
     }
 
     const ASSET_BASE = window.location.pathname.includes('/seu-repositorio/') ? './' : 'seu-repositorio/';
+    const RAW_REPO_ASSETS = 'https://raw.githubusercontent.com/kaunsouza2026-crypto/BomBinha-PJ/main/seu-repositorio/';
     const STATIC_IMG_MAP = {
       cadLogoTopoImg: 'assets/logos/logo_cabecalho.png',
       cadLogoRodapeImg: 'assets/logos/logo_rodape.png',
@@ -1606,18 +1607,18 @@
     };
 
     const AG_LOGO_CANDIDATES = [
-      'assets/logo.png',
-      'assets/logo.jpg',
-      'assets/logo.jpeg',
-      'assets/logos/logo.png',
-      'logo.png'
+      ASSET_BASE + 'assets/logo.png',
+      ASSET_BASE + 'assets/logos/logo.png',
+      ASSET_BASE + 'logo.png',
+      RAW_REPO_ASSETS + 'assets/logo.png',
+      RAW_REPO_ASSETS + 'assets/logos/logo.png'
     ];
 
     function handleAgLogoFallback(imgEl) {
       const idx = parseInt(imgEl.getAttribute('data-try-idx') || '0', 10) + 1;
       if (idx < AG_LOGO_CANDIDATES.length) {
         imgEl.setAttribute('data-try-idx', String(idx));
-        imgEl.src = ASSET_BASE + AG_LOGO_CANDIDATES[idx];
+        imgEl.src = AG_LOGO_CANDIDATES[idx];
       } else {
         imgEl.style.display = 'none';
         const fb = document.getElementById('agFallbackBox');
