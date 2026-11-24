@@ -266,447 +266,7 @@
     </header>
 
     <!-- =======================================================================
-         ABA: CERTIFICADO DIGITAL (PDF OFICIAL)
-         ======================================================================= -->
-    <main id="panel-certificado" class="hidden grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-
-      <!-- COLUNA ESQUERDA -->
-      <section class="lg:col-span-5 panel-card p-4 sm:p-5 flex flex-col gap-4">
-        <div class="flex items-start justify-between gap-2">
-          <div>
-            <h1 class="text-base sm:text-lg font-bold text-slate-900">Comunicado — Certificado Digital</h1>
-            <p class="text-xs text-slate-500">Cole a ficha ou preencha os dados para gerar o PDF oficial</p>
-          </div>
-          <span class="px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-md bg-rose-50 text-[#c8105a] border border-rose-200">
-            CERTIFICADO
-          </span>
-        </div>
-
-        <!-- Seletor de Modo -->
-        <div class="flex items-center gap-4 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-700">
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="certModo" value="auto" checked onchange="toggleCertModo(this.value)" class="accent-[#c8105a]" />
-            <span>Colar Ficha (Automático)</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="certModo" value="manual" onchange="toggleCertModo(this.value)" class="accent-[#c8105a]" />
-            <span>Preencher Manualmente</span>
-          </label>
-        </div>
-
-        <!-- Bloco Colar Ficha -->
-        <div id="certAutoBox" class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-2">
-          <label class="text-[11px] font-bold uppercase tracking-wide text-slate-700">COLE A FICHA DO CLIENTE AQUI</label>
-          <textarea id="certFichaInput" rows="4" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-[#c8105a]" placeholder="Cole a linha (ex: agencia|conta|cnpj|razao|cpf|nome|telefone|usuario) ou o bloco de texto da ficha..."></textarea>
-          <button type="button" onclick="processarFichaCertificado()" class="w-full py-2 px-3 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-[#c8105a] to-[#9e0b46] hover:opacity-95 cursor-pointer">
-            Processar Ficha
-          </button>
-        </div>
-
-        <!-- Dados para o PDF -->
-        <div class="flex flex-col gap-3">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-1">Dados para o PDF</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Razão Social</label>
-              <input type="text" id="certRazao" value="I. A. P. FILHO LTDA" oninput="renderCertificadoPreview()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Situação</label>
-              <input type="text" id="certSituacao" value="ATIVA" oninput="renderCertificadoPreview()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <div class="flex items-center justify-between mb-1">
-                <label class="block text-xs font-semibold text-slate-700">CNPJ</label>
-                <button type="button" onclick="buscarCnpjParaCertificado()" class="text-[11px] font-semibold text-[#c8105a] hover:underline cursor-pointer">
-                  Buscar CNPJ
-                </button>
-              </div>
-              <input type="text" id="certCnpj" value="03.420.175/0002-27" oninput="this.value = formatarCnpjMascara(this.value); renderCertificadoPreview()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">CPF Master (opcional)</label>
-              <input type="text" id="certCpfMaster" value="358.899.262-68" oninput="this.value = formatarCpfLimite(this.value); renderCertificadoPreview()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Usuário(s) (opcional — vazio remove do PDF)</label>
-            <input type="text" id="certUsuario" value="IAPF00025" oninput="renderCertificadoPreview()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
-          </div>
-        </div>
-      </section>
-
-      <!-- COLUNA DIREITA: PREVIEW + DOWNLOAD PDF VIA JSPDF -->
-      <section class="lg:col-span-7 panel-card p-4 sm:p-5 flex flex-col gap-4">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h2 class="text-base sm:text-lg font-bold text-slate-900">Visualização do Documento</h2>
-            <p class="text-xs text-slate-500">Preview em tempo real do comunicado de Certificado Digital</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <button type="button" onclick="limparCertificado()" class="px-3.5 py-2 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 cursor-pointer">
-              Limpar
-            </button>
-            <button type="button" onclick="gerarPdfCertificadoJsPDF()" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-[#c8105a] to-[#9e0b46] hover:opacity-95 shadow-sm flex items-center gap-1.5 cursor-pointer">
-              <span>⬇ Baixar PDF Pronto</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="viewer-dark-shell flex flex-col">
-          <div class="viewer-topbar px-4 py-2.5 flex items-center justify-between text-xs">
-            <span class="bg-slate-700 px-2 py-0.5 rounded font-mono">1 / 1</span>
-            <span class="text-slate-400">CERTIFICADO DIGITAL — A4</span>
-          </div>
-
-          <div class="p-4 sm:p-6 bg-[#525659] overflow-x-auto">
-            <div id="certificadoSheet" class="a4-sheet">
-              <!-- Marca d'água repetida FEBRABAN -->
-              <div id="certWatermarkLayer" class="watermark-grid"></div>
-
-              <div class="relative z-10">
-                <!-- Cabeçalho Oficial -->
-                <div class="flex items-center gap-5 pb-3 mb-4">
-                  <img id="certLogoTopoImg" src="assets/logos/logo_cabecalho.png" alt="Bradesco Empresas e Negócios" class="h-14 object-contain" onerror="this.style.display='none'; document.getElementById('certFallbackLogo').style.display='flex';" />
-                  <div id="certFallbackLogo" style="display:none;" class="items-center gap-2.5 shrink-0">
-                    <svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M14 42C8 35 7 23 14 14C22 5 37 5 46 13" stroke="#CC092F" stroke-width="5.5" stroke-linecap="round"/>
-                      <path d="M8 25C20 18 42 18 52 27C58 33 55 42 46 46" stroke="#CC092F" stroke-width="5.5" stroke-linecap="round"/>
-                      <rect x="24" y="34" width="5.5" height="18" rx="1" fill="#CC092F"/>
-                      <rect x="33" y="30" width="5.5" height="22" rx="1" fill="#CC092F"/>
-                    </svg>
-                    <div class="flex flex-col leading-none">
-                      <span class="text-[#CC092F] font-extrabold text-[20px] tracking-tight">bradesco</span>
-                      <span class="text-[#CC092F] font-normal text-[13px] tracking-tight mt-0.5">empresas e negócios</span>
-                    </div>
-                  </div>
-                  <div class="w-[1px] h-14 bg-[#B0B0B0] shrink-0"></div>
-                  <div class="text-[14px] sm:text-[16px] font-extrabold text-[#111111] tracking-wide uppercase">COMUNICADO IMPORTANTE</div>
-                </div>
-
-                <h2 class="text-[12px] font-extrabold text-[#111111] mb-1 uppercase">CERTIFICADO DIGITAL</h2>
-                <p class="text-[#333333] mb-3.5 text-[10.5px] leading-[1.42]">
-                  Em conformidade com os padrões de segurança adotados pelo Internet Banking Empresarial, comunicamos que o Certificado Digital vinculado ao acesso da empresa encontra-se vencido. Este recurso é utilizado para identificação eletrônica do usuário e acesso aos canais eletrônicos disponibilizados pelo Bradesco Net Empresa.
-                </p>
-
-                <div class="text-[11px] font-extrabold text-[#222222] mb-1 uppercase">DADOS DO MASTER:</div>
-                <table class="w-full text-[10.5px] mb-3.5">
-                  <tr><td class="w-28 py-0.5 font-bold text-[#222222]">Razão Social:</td><td id="pvCertRazao" class="text-[#333333]">I. A. P. FILHO LTDA</td></tr>
-                  <tr><td class="py-0.5 font-bold text-[#222222]">CNPJ:</td><td id="pvCertCnpj" class="text-[#333333]">03.420.175/0002-27</td></tr>
-                  <tr><td class="py-0.5 font-bold text-[#222222]">Situação:</td><td id="pvCertSituacao" class="text-[#333333]">ATIVA</td></tr>
-                  <tr id="pvCertCpfRow"><td class="py-0.5 font-bold text-[#222222]">CPF Master:</td><td id="pvCertCpf" class="text-[#333333]">358.899.262-68</td></tr>
-                  <tr id="pvCertUserRow"><td class="py-0.5 font-bold text-[#222222]">Usuário(s):</td><td id="pvCertUser" class="text-[#333333]">IAPF00025</td></tr>
-                </table>
-
-                <div class="text-[11px] font-extrabold text-[#C8102E] mb-1 uppercase">REFORÇO DE SEGURANÇA</div>
-                <p class="text-[#333333] mb-2 text-[10.5px] leading-[1.4]">
-                  A não renovação do Certificado Digital poderá acarretar restrições operacionais e limitações de acesso aos serviços disponibilizados pelo Internet Banking Empresarial.
-                </p>
-                <div class="text-[10.5px] font-bold text-[#C8102E] mb-1.5">Isto poderá causar os seguintes impactos:</div>
-
-                <ul class="space-y-1.5 mb-2.5 text-[10.5px] text-[#222222]">
-                  <li class="flex items-start gap-2">
-                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#C8102E] text-white text-[9px] font-bold shrink-0 mt-0.5">!</span>
-                    <span>Bloqueio de movimentações eletrônicas, incluindo pagamentos, transferências e autorizações de transações;</span>
-                  </li>
-                  <li class="flex items-start gap-2">
-                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#C8102E] text-white text-[9px] font-bold shrink-0 mt-0.5">!</span>
-                    <span>Limitações de acesso a consultas de extratos, saldos e demais informações disponibilizadas pelos canais digitais;</span>
-                  </li>
-                  <li class="flex items-start gap-2">
-                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#C8102E] text-white text-[9px] font-bold shrink-0 mt-0.5">!</span>
-                    <span>Pendências em operações que dependam de assinatura eletrônica ou múltiplas aprovações;</span>
-                  </li>
-                  <li class="flex items-start gap-2">
-                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#C8102E] text-white text-[9px] font-bold shrink-0 mt-0.5">!</span>
-                    <span>Restrições temporárias na utilização de determinados serviços bancários vinculados ao Internet Banking Empresarial.</span>
-                  </li>
-                </ul>
-
-                <p class="text-[#333333] mb-3.5 text-[10.5px] leading-[1.4]">
-                  Para evitar eventuais restrições operacionais, recomenda-se a renovação do Certificado Digital o mais breve possível após a identificação do vencimento.
-                </p>
-
-                <div class="text-[11px] font-extrabold text-[#111111] mb-1.5">O Certificado Digital tem como finalidade:</div>
-                <ul class="space-y-1.5 mb-3.5 text-[10.5px] text-[#222222]">
-                  <li class="flex items-start gap-2">
-                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#00A859] text-white text-[9px] font-bold shrink-0 mt-0.5">✓</span>
-                    <span>Assinar digitalmente contratos, propostas e operações eletrônicas realizadas pela empresa;</span>
-                  </li>
-                  <li class="flex items-start gap-2">
-                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#00A859] text-white text-[9px] font-bold shrink-0 mt-0.5">✓</span>
-                    <span>Autorizar movimentações financeiras, pagamentos, transferências, agendamentos e demais transações disponibilizadas pelo Internet Banking Empresarial;</span>
-                  </li>
-                  <li class="flex items-start gap-2">
-                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#00A859] text-white text-[9px] font-bold shrink-0 mt-0.5">✓</span>
-                    <span>Garantir a identificação eletrônica do usuário durante a utilização dos canais digitais;</span>
-                  </li>
-                  <li class="flex items-start gap-2">
-                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#00A859] text-white text-[9px] font-bold shrink-0 mt-0.5">✓</span>
-                    <span>Reforçar a segurança das operações, protegendo a conta por meio de mecanismos criptográficos exclusivos vinculados à empresa.</span>
-                  </li>
-                </ul>
-
-                <div class="text-[11px] font-extrabold text-[#111111] mb-1">O que é Certificado Digital?</div>
-                <p class="text-[#333333] mb-1.5 text-[10.5px] leading-[1.4]">
-                  Trata-se de um documento eletrônico que permite o armazenamento dos dados cadastrais do usuário para posterior utilização na identificação eletrônica do mesmo.
-                </p>
-                <p class="text-[#333333] mb-1.5 text-[10.5px] leading-[1.4]">
-                  Para garantir a segurança e privacidade dos dados, cada usuário deverá gerar o seu Certificado Digital e criar uma senha que será solicitada nos momentos de utilização do Certificado Digital.
-                </p>
-                <div class="text-[10.5px] font-bold text-[#111111] mb-1">O uso é obrigatório para acessar o site e nas assinaturas das transações.</div>
-                <p class="text-[#333333] mb-2 text-[10.5px] leading-[1.4]">
-                  O Certificado é de propriedade do Bradesco e tem validade de 36 meses a contar da data da geração. Quando estiver próximo do vencimento, o Bradesco Net Empresa alertará o usuário em cada um dos seus acessos, até que seja efetivada a troca do mesmo. Caso o usuário queira realizar a troca antes do período de 36 meses, o mesmo poderá realizá-lo no próprio Bradesco Net Empresa, dentro do ambiente transacional.
-                </p>
-                <p class="text-[#333333] mb-5 text-[10.5px] leading-[1.4]">
-                  Em caso de dúvidas, recomenda-se entrar em contato com seu gerente de contas ou com a central de atendimento empresarial.
-                </p>
-
-                <!-- Rodapé Institucional FEBRABAN + QR Code -->
-                <div class="flex items-center justify-center gap-10 pt-1">
-                  <div>
-                    <img id="certLogoRodapeImg" src="assets/logos/logo_rodape.png" alt="FEBRABAN" class="h-11 object-contain" onerror="this.style.display='none'; document.getElementById('certFallbackRodape').style.display='flex';" />
-                    <div id="certFallbackRodape" style="display:none;" class="items-center gap-2">
-                      <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="32" height="32" rx="2" fill="#46B8DA"/>
-                        <path d="M9 24L15 8H19L13 24H9Z" fill="white"/>
-                        <path d="M17 24L23 8H27L21 24H17Z" fill="white"/>
-                      </svg>
-                      <span class="font-black text-[#111111] tracking-wider text-base">FEBRABAN</span>
-                    </div>
-                  </div>
-                  <div class="text-center">
-                    <img id="certQrImg" src="assets/logos/qrcode.png" alt="QR Code" class="w-20 h-20 object-contain mx-auto mb-1" onerror="this.style.display='none'; document.getElementById('certFallbackQr').style.display='block';" />
-                    <div id="certFallbackQr" style="display:none;" class="mx-auto mb-1 w-20 h-20">
-                      <svg viewBox="0 0 100 100" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="100" height="100" fill="#ffffff"/>
-                        <path d="M6 6h28v28H6V6zm6 6v16h16V12H12zm6 6h4v4h-4v-4zm48-12h28v28H66V6zm6 6v16h16V12H72zm6 6h4v4h-4v-4zM6 66h28v28H6V66zm6 6v16h16V72H12zm6 6h4v4h-4v-4zm24-60h6v12h-6V18zm12 6h6v18h-6V24zm-12 18h12v6H42v-6zm-24 6h18v6H18v-6zm24 12h18v6H42v-6zm24-12h12v12H66V48zm18 6h10v12H84V54zM42 66h12v12H42V66zm18 6h12v6H60v-6zm18 6h16v16H78V78zm-36 12h24v6H42v-6z" fill="#111111"/>
-                      </svg>
-                    </div>
-                    <div class="text-[9px] leading-tight text-[#666666]">
-                      <div>Escaneie o QR Code para acessar o portal</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- =======================================================================
-         ABA 4: BOLETIM DE OCORRÊNCIA (BOU)
-         ======================================================================= -->
-    <main id="panel-boletim" class="hidden grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-
-      <!-- COLUNA ESQUERDA -->
-      <section class="lg:col-span-5 panel-card p-4 sm:p-5 flex flex-col gap-4">
-        <div class="flex items-start justify-between gap-2">
-          <div>
-            <h1 class="text-base sm:text-lg font-bold text-slate-900">Gerador de Boletim Web</h1>
-            <p class="text-xs text-slate-500">Preencha os dados abaixo para gerar e baixar o PDF oficial (2 páginas)</p>
-          </div>
-          <span class="px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-md bg-rose-50 text-[#c8105a] border border-rose-200">
-            BOU / PDF
-          </span>
-        </div>
-
-        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-3">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Selecione o Estado (UF):</label>
-              <select id="bouUf" onchange="renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]"></select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Selecione a Logo do Banco:</label>
-              <select id="bouBanco" onchange="renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]"></select>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Tipo de Ocorrência (Dinâmica):</label>
-            <select id="bouTipoOcorrencia" onchange="renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]">
-              <option value="Acesso Indevido à Conta">Acesso Indevido à Conta</option>
-              <option value="Acesso Indevido ao Aplicativo">Acesso Indevido ao Aplicativo</option>
-              <option value="Cancelamento de Empréstimo">Cancelamento de Empréstimo</option>
-              <option value="Dispositivo Clonado">Dispositivo Clonado</option>
-              <option value="Fraude na Agência">Fraude na Agência</option>
-              <option value="Operações Não Autorizadas">Operações Não Autorizadas</option>
-              <option value="Transferência Indevida">Transferência Indevida</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Número do Registro (BOU):</label>
-            <input type="text" id="bouNumero" value="025-06119/2026" oninput="renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
-          </div>
-        </div>
-
-        <!-- Dados da Vítima -->
-        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-2.5">
-          <span class="text-xs font-bold uppercase tracking-wide text-slate-800">Dados da Vítima</span>
-          <div>
-            <label class="block text-xs font-medium text-slate-600 mb-1">Nome Completo:</label>
-            <input type="text" id="bouVitimaNome" placeholder="Ex: Carlos Eduardo" oninput="renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
-          </div>
-          <div class="grid grid-cols-2 gap-2.5">
-            <div>
-              <label class="block text-xs font-medium text-slate-600 mb-1">CPF:</label>
-              <input type="text" id="bouVitimaCpf" maxlength="14" placeholder="000.000.000-00" oninput="this.value = formatarCpfLimite(this.value); renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-600 mb-1">Celular:</label>
-              <input type="text" id="bouVitimaCelular" maxlength="15" placeholder="(00) 00000-0000" oninput="this.value = formatarContatoLimite(this.value); renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
-            </div>
-          </div>
-        </div>
-
-        <!-- Textos Jurídicos Editáveis -->
-        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-2">
-          <span class="text-xs font-bold uppercase tracking-wide text-slate-800">Capitulação & Despacho</span>
-          <div>
-            <label class="block text-[11px] font-medium text-slate-600 mb-1">Capitulação (Fato Atípico):</label>
-            <input type="text" id="bouCapitulacao" value="Art. 154-A do Código Penal . Motivo Presumido Crime Cibernético - Invasão de Dispositivo Informático" oninput="renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900" />
-          </div>
-          <div>
-            <label class="block text-[11px] font-medium text-slate-600 mb-1">Despacho da Autoridade:</label>
-            <textarea id="bouDespacho" rows="2" oninput="renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900">Considerando a natureza da ocorrência, encaminhe-se este registro para o Departamento de Investigação de Crimes Cibernéticos para as devidas apurações e providências legais cabíveis.</textarea>
-          </div>
-        </div>
-
-        <!-- Assets Opcionais do Boletim -->
-        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-2">
-          <span class="text-xs font-semibold text-slate-700">Imagens do Boletim (opcional — busca automática em assets/)</span>
-          <div class="grid grid-cols-3 gap-2 text-xs">
-            <label class="px-2 py-2 rounded-lg border border-slate-300 bg-white text-center font-medium text-slate-700 hover:bg-slate-100 cursor-pointer">
-              Brasão Polícia
-              <input type="file" accept="image/*" class="hidden" onchange="uploadBouAsset(event, 'policia')" />
-            </label>
-            <label class="px-2 py-2 rounded-lg border border-slate-300 bg-white text-center font-medium text-slate-700 hover:bg-slate-100 cursor-pointer">
-              Logo Banco
-              <input type="file" accept="image/*" class="hidden" onchange="uploadBouAsset(event, 'banco')" />
-            </label>
-            <label class="px-2 py-2 rounded-lg border border-slate-300 bg-white text-center font-medium text-slate-700 hover:bg-slate-100 cursor-pointer">
-              Assinatura
-              <input type="file" accept="image/*" class="hidden" onchange="uploadBouAsset(event, 'assinatura')" />
-            </label>
-          </div>
-        </div>
-      </section>
-
-      <!-- COLUNA DIREITA: PREVIEW 2 PÁGINAS + DOWNLOAD PDF -->
-      <section class="lg:col-span-7 panel-card p-4 sm:p-5 flex flex-col gap-4">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h2 class="text-base sm:text-lg font-bold text-slate-900">Visualização do Boletim (BOU)</h2>
-            <p class="text-xs text-slate-500">Preview em tempo real das 2 páginas A4</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <button type="button" onclick="limparBoletim()" class="px-3.5 py-2 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 cursor-pointer">
-              Limpar
-            </button>
-            <button type="button" onclick="gerarPdfBoletimJsPDF()" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-[#c8105a] to-[#9e0b46] hover:opacity-95 shadow-sm flex items-center gap-1.5 cursor-pointer">
-              <span>📥 Processar e Baixar PDF</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="viewer-dark-shell flex flex-col">
-          <div class="viewer-topbar px-4 py-2.5 flex items-center justify-between text-xs">
-            <span class="bg-slate-700 px-2 py-0.5 rounded font-mono">2 páginas</span>
-            <span class="text-slate-400">REGISTRO DE OCORRÊNCIA — A4</span>
-          </div>
-
-          <div class="p-4 sm:p-6 bg-[#525659] overflow-x-auto flex flex-col gap-6">
-            <!-- PÁGINA 1 -->
-            <div class="a4-sheet text-black">
-              <div class="flex items-center gap-4 pb-3">
-                <img id="pvBouLogoPolicia" alt="Brasão Polícia" class="w-20 h-24 object-contain shrink-0" onerror="this.style.display='none'; document.getElementById('pvBouBrasaoFallback').style.display='flex';" />
-                <div id="pvBouBrasaoFallback" style="display:none;" class="w-20 h-24 border border-slate-400 rounded flex-col items-center justify-center text-center p-1 shrink-0 text-[9px] font-bold text-slate-700">
-                  <span>BRASÃO</span>
-                  <span>POLÍCIA CIVIL</span>
-                </div>
-                <div class="flex-1 text-center leading-snug">
-                  <div id="pvBouGoverno" class="font-bold text-[11px]">GOVERNO DO ESTADO DO ACRE</div>
-                  <div class="font-bold text-[11px]">SECRETARIA DE ESTADO DA SEGURANÇA PÚBLICA</div>
-                  <div id="pvBouPolicia" class="text-[11px]">POLÍCIA CIVIL DO ESTADO DO ACRE</div>
-                  <div id="pvBouEndereco" class="text-[10px]">Rua Quintino Bocaiúva, 1490 - Bosque, Rio Branco - AC</div>
-                  <div id="pvBouDelegacia" class="font-bold text-[11px]">Delegacia Especializada de Repressão a Crimes Cibernéticos</div>
-                </div>
-              </div>
-
-              <div class="border-t-2 border-black my-2"></div>
-              <div class="border-t-2 border-black mt-3 mb-2"></div>
-
-              <div class="flex items-center justify-between font-bold text-[12px] py-1">
-                <span>REGISTRO DE OCORRÊNCIA</span>
-                <span id="pvBouNumero">No. 025-06119/2026</span>
-              </div>
-
-              <div class="border-t-2 border-black mt-2 mb-4"></div>
-
-              <div class="text-[11px] space-y-1.5 mb-4">
-                <div id="pvBouInicio">Início do Registro: 24 de Novembro de 2026 - Terça-feira às 18:27</div>
-                <div id="pvBouOrigem">Origem: Delegacia de Polícia Digital . Circunscrição: 01ª Delegacia</div>
-              </div>
-
-              <div class="border-t border-black my-3"></div>
-
-              <div class="font-bold text-[11px] mb-1">Fato Atípico</div>
-              <div class="border-t border-black mb-2"></div>
-              <div id="pvBouCapitulacao" class="text-[11px] mb-5">Capitulação: Art. 154-A do Código Penal . Motivo Presumido Crime Cibernético - Invasão de Dispositivo Informático</div>
-
-              <div class="font-bold text-[11px] mb-1">Despacho da Autoridade</div>
-              <div class="border-t border-black mb-2"></div>
-              <div id="pvBouDespacho" class="text-[11px] mb-6">Considerando a natureza da ocorrência, encaminhe-se este registro para o Departamento de Investigação de Crimes Cibernéticos para as devidas apurações e providências legais cabíveis.</div>
-
-              <div class="font-bold text-[11px] mb-1">Envolvido(s) na Ocorrência - Vítima</div>
-              <div class="border-t border-black mb-3"></div>
-
-              <div class="flex items-start justify-between gap-4 mb-6">
-                <table class="text-[11px]">
-                  <tr><td class="font-bold pr-4 py-0.5">Nome</td><td id="pvBouVitimaNome">NÃO INFORMADO</td></tr>
-                  <tr><td class="font-bold pr-4 py-0.5">CPF:</td><td id="pvBouVitimaCpf">000.000.000-00</td></tr>
-                  <tr><td class="font-bold pr-4 py-0.5">CELULAR:</td><td id="pvBouVitimaCelular">(00) 00000-0000</td></tr>
-                </table>
-                <img id="pvBouLogoBanco" alt="Logo Banco" class="max-w-[140px] max-h-[42px] object-contain" onerror="this.style.display='none'" />
-              </div>
-
-              <div class="border-t border-black my-3"></div>
-
-              <div class="font-bold text-[11px] mb-1">Dinâmica do fato</div>
-              <div class="border-t-2 border-black mb-2"></div>
-              <div id="pvBouDinamica" class="text-[11px] mb-5">ACESSO INDEVIDO (INVASÃO) APP BRADESCO, ACESSO INDEVIDO À CONTA E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO</div>
-
-              <div class="font-bold text-[11px] mb-1">PROCEDIMENTO DE CANCELAMENTO IMEDIATO ATRAVÉS DE VALIDAÇÃO BIOMETRIA FACIAL</div>
-              <div class="border-t-2 border-black mb-6"></div>
-
-              <div class="font-bold text-[11px] mb-1">Diligências Realizadas</div>
-              <div class="border-t-2 border-black"></div>
-            </div>
-
-            <!-- PÁGINA 2 -->
-            <div class="a4-sheet text-black !min-h-[340px]">
-              <div class="text-[11px] mb-10">Protocolo Administrativo nº: 048640-1023/2026</div>
-              <div class="flex flex-col items-center justify-center mt-6">
-                <img id="pvBouAssinatura" alt="Assinatura" class="h-12 object-contain mb-1" onerror="this.style.display='none'" />
-                <div class="w-60 border-t border-black mb-2"></div>
-                <div id="pvBouInvestigador" class="font-bold text-[11px]">CARLOS EDUARDO MENDES OLIVEIRA</div>
-                <div id="pvBouInvestigadorCargo" class="text-[9.5px] text-slate-700">Investigador Policial - 112.045-1</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- =======================================================================
-         ABA 5: CONSULTA CNPJ COMPLETA
+         ABA 1: MONITOR PJ
          ======================================================================= -->
     <main id="panel-monitor" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
@@ -903,20 +463,16 @@
           </button>
         </div>
 
-        <!-- Fotos do Monitor -->
-        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-2">
-          <span class="text-xs font-semibold text-slate-700">Foto do Monitor (1695 × 928 px)</span>
-          <div class="flex flex-wrap items-center gap-2">
+        <!-- Seleção do Monitor (homem.png / mulher.png) -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-2">
+          <span class="text-xs font-semibold text-slate-700">Modelo do Monitor:</span>
+          <div class="flex items-center gap-2">
             <button type="button" id="btnSlotHomem" onclick="selectMonitorSlot('homem')" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#c8105a] bg-rose-50 text-[#c8105a] cursor-pointer">
               👨 Homem
             </button>
             <button type="button" id="btnSlotMulher" onclick="selectMonitorSlot('mulher')" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-700 cursor-pointer">
               👩 Mulher
             </button>
-            <label class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 cursor-pointer">
-              📁 Carregar Foto
-              <input type="file" id="bgMonitorInput" accept="image/*" class="hidden" onchange="handleMonitorUpload(event)" />
-            </label>
           </div>
         </div>
       </section>
@@ -964,19 +520,6 @@
           <div class="p-3 sm:p-5 bg-[#383a3e]">
             <div id="monitorBox" class="relative w-full aspect-[1695/928] rounded-lg overflow-hidden shadow-2xl bg-[#09111e] border border-slate-700">
               <canvas id="outputCanvas" width="1695" height="928" class="w-full h-full block"></canvas>
-
-              <div id="emptyPhotoOverlay" class="hidden absolute inset-0 bg-slate-950/90 flex-col items-center justify-center text-center p-6 z-15">
-                <div class="max-w-md bg-slate-900 border border-dashed border-sky-400 rounded-2xl p-6 flex flex-col items-center gap-3">
-                  <div class="text-3xl">🖥️</div>
-                  <h3 class="text-sm font-bold text-white">Selecione a Foto do Monitor (1695 × 928)</h3>
-                  <p class="text-xs text-slate-400">
-                    Carregue <strong>homem.png</strong> ou <strong>mulher.png</strong> uma única vez — ela ficará salva automaticamente neste navegador.
-                  </p>
-                  <button type="button" onclick="document.getElementById('bgMonitorInput').click()" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-sky-600 hover:bg-sky-500 cursor-pointer">
-                    Carregar Foto do Monitor
-                  </button>
-                </div>
-              </div>
 
               <!-- Overlay Interativo de Calibração -->
               <div id="calibrationOverlay">
@@ -1067,25 +610,6 @@
             <input type="text" id="cadUsuario" value="PAPDB00001" oninput="renderCadastralPreview()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
           </div>
         </div>
-
-        <!-- Upload de Imagens Personalizadas -->
-        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-2">
-          <span class="text-xs font-semibold text-slate-700">Imagens do PDF (opcional — já possui logos embutidos)</span>
-          <div class="grid grid-cols-3 gap-2 text-xs">
-            <label class="px-2 py-2 rounded-lg border border-slate-300 bg-white text-center font-medium text-slate-700 hover:bg-slate-100 cursor-pointer">
-              Logo Topo
-              <input type="file" accept="image/*" class="hidden" onchange="uploadCadAsset(event, 'topo')" />
-            </label>
-            <label class="px-2 py-2 rounded-lg border border-slate-300 bg-white text-center font-medium text-slate-700 hover:bg-slate-100 cursor-pointer">
-              Logo Rodapé
-              <input type="file" accept="image/*" class="hidden" onchange="uploadCadAsset(event, 'rodape')" />
-            </label>
-            <label class="px-2 py-2 rounded-lg border border-slate-300 bg-white text-center font-medium text-slate-700 hover:bg-slate-100 cursor-pointer">
-              QR Code
-              <input type="file" accept="image/*" class="hidden" onchange="uploadCadAsset(event, 'qr')" />
-            </label>
-          </div>
-        </div>
       </section>
 
       <!-- COLUNA DIREITA: PREVIEW + DOWNLOAD PDF VIA JSPDF -->
@@ -1119,7 +643,7 @@
               <div class="relative z-10">
                 <!-- Cabeçalho Oficial: Logo Bradesco + Linha Vertical + COMUNICADO IMPORTANTE -->
                 <div class="flex items-center gap-5 pb-4 mb-6">
-                  <img id="cadLogoTopoImg" src="assets/logos/logo_cabecalho.png" alt="Bradesco Empresas e Negócios" class="h-16 object-contain" onerror="this.style.display='none'; document.getElementById('cadFallbackLogo').style.display='flex';" />
+                  <img id="cadLogoTopoImg" src="seu-repositorio/assets/logos/logo_cabecalho.png" alt="Bradesco Empresas e Negócios" class="h-16 object-contain" onerror="this.style.display='none'; document.getElementById('cadFallbackLogo').style.display='flex';" />
                   <div id="cadFallbackLogo" style="display:none;" class="items-center gap-2.5 shrink-0">
                     <svg width="46" height="46" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M14 42C8 35 7 23 14 14C22 5 37 5 46 13" stroke="#CC092F" stroke-width="5.5" stroke-linecap="round"/>
@@ -1183,7 +707,7 @@
                 <!-- Rodapé Institucional FEBRABAN + QR Code -->
                 <div class="flex items-center justify-center gap-10 pt-2">
                   <div>
-                    <img id="cadLogoRodapeImg" src="assets/logos/logo_rodape.png" alt="FEBRABAN" class="h-12 object-contain" onerror="this.style.display='none'; document.getElementById('cadFallbackRodape').style.display='flex';" />
+                    <img id="cadLogoRodapeImg" src="seu-repositorio/assets/logos/logo_rodape.png" alt="FEBRABAN" class="h-12 object-contain" onerror="this.style.display='none'; document.getElementById('cadFallbackRodape').style.display='flex';" />
                     <div id="cadFallbackRodape" style="display:none;" class="items-center gap-2">
                       <svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect width="32" height="32" rx="2" fill="#46B8DA"/>
@@ -1194,7 +718,7 @@
                     </div>
                   </div>
                   <div class="text-center">
-                    <img id="cadQrImg" src="assets/logos/qrcode.png" alt="QR Code" class="w-24 h-24 object-contain mx-auto mb-1.5" onerror="this.style.display='none'; document.getElementById('cadFallbackQr').style.display='block';" />
+                    <img id="cadQrImg" src="seu-repositorio/assets/logos/qrcode.png" alt="QR Code" class="w-24 h-24 object-contain mx-auto mb-1.5" onerror="this.style.display='none'; document.getElementById('cadFallbackQr').style.display='block';" />
                     <div id="cadFallbackQr" style="display:none;" class="mx-auto mb-1.5 w-24 h-24">
                       <svg viewBox="0 0 100 100" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
                         <rect width="100" height="100" fill="#ffffff"/>
@@ -1215,7 +739,241 @@
     </main>
 
     <!-- =======================================================================
-         ABA 3: CONFIRMAÇÃO DE AGENDAMENTO (agendamento/app_agendamento.py)
+         ABA 3: CERTIFICADO DIGITAL (PDF OFICIAL)
+         ======================================================================= -->
+    <main id="panel-certificado" class="hidden grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+      <!-- COLUNA ESQUERDA -->
+      <section class="lg:col-span-5 panel-card p-4 sm:p-5 flex flex-col gap-4">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <h1 class="text-base sm:text-lg font-bold text-slate-900">Comunicado — Certificado Digital</h1>
+            <p class="text-xs text-slate-500">Cole a ficha ou preencha os dados para gerar o PDF oficial</p>
+          </div>
+          <span class="px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-md bg-rose-50 text-[#c8105a] border border-rose-200">
+            CERTIFICADO
+          </span>
+        </div>
+
+        <!-- Seletor de Modo -->
+        <div class="flex items-center gap-4 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-700">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="certModo" value="auto" checked onchange="toggleCertModo(this.value)" class="accent-[#c8105a]" />
+            <span>Colar Ficha (Automático)</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="certModo" value="manual" onchange="toggleCertModo(this.value)" class="accent-[#c8105a]" />
+            <span>Preencher Manualmente</span>
+          </label>
+        </div>
+
+        <!-- Bloco Colar Ficha -->
+        <div id="certAutoBox" class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-2">
+          <label class="text-[11px] font-bold uppercase tracking-wide text-slate-700">COLE A FICHA DO CLIENTE AQUI</label>
+          <textarea id="certFichaInput" rows="4" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-[#c8105a]" placeholder="Cole a linha (ex: agencia|conta|cnpj|razao|cpf|nome|telefone|usuario) ou o bloco de texto da ficha..."></textarea>
+          <button type="button" onclick="processarFichaCertificado()" class="w-full py-2 px-3 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-[#c8105a] to-[#9e0b46] hover:opacity-95 cursor-pointer">
+            Processar Ficha
+          </button>
+        </div>
+
+        <!-- Dados para o PDF -->
+        <div class="flex flex-col gap-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-1">Dados para o PDF</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Razão Social</label>
+              <input type="text" id="certRazao" value="I. A. P. FILHO LTDA" oninput="renderCertificadoPreview()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Situação</label>
+              <input type="text" id="certSituacao" value="ATIVA" oninput="renderCertificadoPreview()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-semibold text-slate-700">CNPJ</label>
+                <button type="button" onclick="buscarCnpjParaCertificado()" class="text-[11px] font-semibold text-[#c8105a] hover:underline cursor-pointer">
+                  Buscar CNPJ
+                </button>
+              </div>
+              <input type="text" id="certCnpj" value="03.420.175/0002-27" oninput="this.value = formatarCnpjMascara(this.value); renderCertificadoPreview()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">CPF Master (opcional)</label>
+              <input type="text" id="certCpfMaster" value="358.899.262-68" oninput="this.value = formatarCpfLimite(this.value); renderCertificadoPreview()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Usuário(s) (opcional — vazio remove do PDF)</label>
+            <input type="text" id="certUsuario" value="IAPF00025" oninput="renderCertificadoPreview()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
+          </div>
+        </div>
+      </section>
+
+      <!-- COLUNA DIREITA: PREVIEW + DOWNLOAD PDF VIA JSPDF -->
+      <section class="lg:col-span-7 panel-card p-4 sm:p-5 flex flex-col gap-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">Visualização do Documento</h2>
+            <p class="text-xs text-slate-500">Preview em tempo real do comunicado de Certificado Digital</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="limparCertificado()" class="px-3.5 py-2 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 cursor-pointer">
+              Limpar
+            </button>
+            <button type="button" onclick="gerarPdfCertificadoJsPDF()" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-[#c8105a] to-[#9e0b46] hover:opacity-95 shadow-sm flex items-center gap-1.5 cursor-pointer">
+              <span>⬇ Baixar PDF Pronto</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="viewer-dark-shell flex flex-col">
+          <div class="viewer-topbar px-4 py-2.5 flex items-center justify-between text-xs">
+            <span class="bg-slate-700 px-2 py-0.5 rounded font-mono">1 / 1</span>
+            <span class="text-slate-400">CERTIFICADO DIGITAL — A4</span>
+          </div>
+
+          <div class="p-4 sm:p-6 bg-[#525659] overflow-x-auto">
+            <div id="certificadoSheet" class="a4-sheet">
+              <!-- Marca d'água repetida FEBRABAN -->
+              <div id="certWatermarkLayer" class="watermark-grid"></div>
+
+              <div class="relative z-10">
+                <!-- Cabeçalho Oficial -->
+                <div class="flex items-center gap-5 pb-3 mb-4">
+                  <img id="certLogoTopoImg" src="seu-repositorio/assets/logos/logo_cabecalho.png" alt="Bradesco Empresas e Negócios" class="h-14 object-contain" onerror="this.style.display='none'; document.getElementById('certFallbackLogo').style.display='flex';" />
+                  <div id="certFallbackLogo" style="display:none;" class="items-center gap-2.5 shrink-0">
+                    <svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M14 42C8 35 7 23 14 14C22 5 37 5 46 13" stroke="#CC092F" stroke-width="5.5" stroke-linecap="round"/>
+                      <path d="M8 25C20 18 42 18 52 27C58 33 55 42 46 46" stroke="#CC092F" stroke-width="5.5" stroke-linecap="round"/>
+                      <rect x="24" y="34" width="5.5" height="18" rx="1" fill="#CC092F"/>
+                      <rect x="33" y="30" width="5.5" height="22" rx="1" fill="#CC092F"/>
+                    </svg>
+                    <div class="flex flex-col leading-none">
+                      <span class="text-[#CC092F] font-extrabold text-[20px] tracking-tight">bradesco</span>
+                      <span class="text-[#CC092F] font-normal text-[13px] tracking-tight mt-0.5">empresas e negócios</span>
+                    </div>
+                  </div>
+                  <div class="w-[1px] h-14 bg-[#B0B0B0] shrink-0"></div>
+                  <div class="text-[14px] sm:text-[16px] font-extrabold text-[#111111] tracking-wide uppercase">COMUNICADO IMPORTANTE</div>
+                </div>
+
+                <h2 class="text-[12px] font-extrabold text-[#111111] mb-1 uppercase">CERTIFICADO DIGITAL</h2>
+                <p class="text-[#333333] mb-3.5 text-[10.5px] leading-[1.42]">
+                  Em conformidade com os padrões de segurança adotados pelo Internet Banking Empresarial, comunicamos que o Certificado Digital vinculado ao acesso da empresa encontra-se vencido. Este recurso é utilizado para identificação eletrônica do usuário e acesso aos canais eletrônicos disponibilizados pelo Bradesco Net Empresa.
+                </p>
+
+                <div class="text-[11px] font-extrabold text-[#222222] mb-1 uppercase">DADOS DO MASTER:</div>
+                <table class="w-full text-[10.5px] mb-3.5">
+                  <tr><td class="w-28 py-0.5 font-bold text-[#222222]">Razão Social:</td><td id="pvCertRazao" class="text-[#333333]">I. A. P. FILHO LTDA</td></tr>
+                  <tr><td class="py-0.5 font-bold text-[#222222]">CNPJ:</td><td id="pvCertCnpj" class="text-[#333333]">03.420.175/0002-27</td></tr>
+                  <tr><td class="py-0.5 font-bold text-[#222222]">Situação:</td><td id="pvCertSituacao" class="text-[#333333]">ATIVA</td></tr>
+                  <tr id="pvCertCpfRow"><td class="py-0.5 font-bold text-[#222222]">CPF Master:</td><td id="pvCertCpf" class="text-[#333333]">358.899.262-68</td></tr>
+                  <tr id="pvCertUserRow"><td class="py-0.5 font-bold text-[#222222]">Usuário(s):</td><td id="pvCertUser" class="text-[#333333]">IAPF00025</td></tr>
+                </table>
+
+                <div class="text-[11px] font-extrabold text-[#C8102E] mb-1 uppercase">REFORÇO DE SEGURANÇA</div>
+                <p class="text-[#333333] mb-2 text-[10.5px] leading-[1.4]">
+                  A não renovação do Certificado Digital poderá acarretar restrições operacionais e limitações de acesso aos serviços disponibilizados pelo Internet Banking Empresarial.
+                </p>
+                <div class="text-[10.5px] font-bold text-[#C8102E] mb-1.5">Isto poderá causar os seguintes impactos:</div>
+
+                <ul class="space-y-1.5 mb-2.5 text-[10.5px] text-[#222222]">
+                  <li class="flex items-start gap-2">
+                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#C8102E] text-white text-[9px] font-bold shrink-0 mt-0.5">!</span>
+                    <span>Bloqueio de movimentações eletrônicas, incluindo pagamentos, transferências e autorizações de transações;</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#C8102E] text-white text-[9px] font-bold shrink-0 mt-0.5">!</span>
+                    <span>Limitações de acesso a consultas de extratos, saldos e demais informações disponibilizadas pelos canais digitais;</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#C8102E] text-white text-[9px] font-bold shrink-0 mt-0.5">!</span>
+                    <span>Pendências em operações que dependam de assinatura eletrônica ou múltiplas aprovações;</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#C8102E] text-white text-[9px] font-bold shrink-0 mt-0.5">!</span>
+                    <span>Restrições temporárias na utilização de determinados serviços bancários vinculados ao Internet Banking Empresarial.</span>
+                  </li>
+                </ul>
+
+                <p class="text-[#333333] mb-3.5 text-[10.5px] leading-[1.4]">
+                  Para evitar eventuais restrições operacionais, recomenda-se a renovação do Certificado Digital o mais breve possível após a identificação do vencimento.
+                </p>
+
+                <div class="text-[11px] font-extrabold text-[#111111] mb-1.5">O Certificado Digital tem como finalidade:</div>
+                <ul class="space-y-1.5 mb-3.5 text-[10.5px] text-[#222222]">
+                  <li class="flex items-start gap-2">
+                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#00A859] text-white text-[9px] font-bold shrink-0 mt-0.5">✓</span>
+                    <span>Assinar digitalmente contratos, propostas e operações eletrônicas realizadas pela empresa;</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#00A859] text-white text-[9px] font-bold shrink-0 mt-0.5">✓</span>
+                    <span>Autorizar movimentações financeiras, pagamentos, transferências, agendamentos e demais transações disponibilizadas pelo Internet Banking Empresarial;</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#00A859] text-white text-[9px] font-bold shrink-0 mt-0.5">✓</span>
+                    <span>Garantir a identificação eletrônica do usuário durante a utilização dos canais digitais;</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#00A859] text-white text-[9px] font-bold shrink-0 mt-0.5">✓</span>
+                    <span>Reforçar a segurança das operações, protegendo a conta por meio de mecanismos criptográficos exclusivos vinculados à empresa.</span>
+                  </li>
+                </ul>
+
+                <div class="text-[11px] font-extrabold text-[#111111] mb-1">O que é Certificado Digital?</div>
+                <p class="text-[#333333] mb-1.5 text-[10.5px] leading-[1.4]">
+                  Trata-se de um documento eletrônico que permite o armazenamento dos dados cadastrais do usuário para posterior utilização na identificação eletrônica do mesmo.
+                </p>
+                <p class="text-[#333333] mb-1.5 text-[10.5px] leading-[1.4]">
+                  Para garantir a segurança e privacidade dos dados, cada usuário deverá gerar o seu Certificado Digital e criar uma senha que será solicitada nos momentos de utilização do Certificado Digital.
+                </p>
+                <div class="text-[10.5px] font-bold text-[#111111] mb-1">O uso é obrigatório para acessar o site e nas assinaturas das transações.</div>
+                <p class="text-[#333333] mb-2 text-[10.5px] leading-[1.4]">
+                  O Certificado é de propriedade do Bradesco e tem validade de 36 meses a contar da data da geração. Quando estiver próximo do vencimento, o Bradesco Net Empresa alertará o usuário em cada um dos seus acessos, até que seja efetivada a troca do mesmo. Caso o usuário queira realizar a troca antes do período de 36 meses, o mesmo poderá realizá-lo no próprio Bradesco Net Empresa, dentro do ambiente transacional.
+                </p>
+                <p class="text-[#333333] mb-5 text-[10.5px] leading-[1.4]">
+                  Em caso de dúvidas, recomenda-se entrar em contato com seu gerente de contas ou com a central de atendimento empresarial.
+                </p>
+
+                <!-- Rodapé Institucional FEBRABAN + QR Code -->
+                <div class="flex items-center justify-center gap-10 pt-1">
+                  <div>
+                    <img id="certLogoRodapeImg" src="seu-repositorio/assets/logos/logo_rodape.png" alt="FEBRABAN" class="h-11 object-contain" onerror="this.style.display='none'; document.getElementById('certFallbackRodape').style.display='flex';" />
+                    <div id="certFallbackRodape" style="display:none;" class="items-center gap-2">
+                      <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="32" height="32" rx="2" fill="#46B8DA"/>
+                        <path d="M9 24L15 8H19L13 24H9Z" fill="white"/>
+                        <path d="M17 24L23 8H27L21 24H17Z" fill="white"/>
+                      </svg>
+                      <span class="font-black text-[#111111] tracking-wider text-base">FEBRABAN</span>
+                    </div>
+                  </div>
+                  <div class="text-center">
+                    <img id="certQrImg" src="seu-repositorio/assets/logos/qrcode.png" alt="QR Code" class="w-20 h-20 object-contain mx-auto mb-1" onerror="this.style.display='none'; document.getElementById('certFallbackQr').style.display='block';" />
+                    <div id="certFallbackQr" style="display:none;" class="mx-auto mb-1 w-20 h-20">
+                      <svg viewBox="0 0 100 100" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100" height="100" fill="#ffffff"/>
+                        <path d="M6 6h28v28H6V6zm6 6v16h16V12H12zm6 6h4v4h-4v-4zm48-12h28v28H66V6zm6 6v16h16V12H72zm6 6h4v4h-4v-4zM6 66h28v28H6V66zm6 6v16h16V72H12zm6 6h4v4h-4v-4zm24-60h6v12h-6V18zm12 6h6v18h-6V24zm-12 18h12v6H42v-6zm-24 6h18v6H18v-6zm24 12h18v6H42v-6zm24-12h12v12H66V48zm18 6h10v12H84V54zM42 66h12v12H42V66zm18 6h12v6H60v-6zm18 6h16v16H78V78zm-36 12h24v6H42v-6z" fill="#111111"/>
+                      </svg>
+                    </div>
+                    <div class="text-[9px] leading-tight text-[#666666]">
+                      <div>Escaneie o QR Code para acessar o portal</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- =======================================================================
+         ABA 4: CONFIRMAÇÃO DE AGENDAMENTO (agendamento/app_agendamento.py)
          ======================================================================= -->
     <main id="panel-agendamento" class="hidden grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
@@ -1308,15 +1066,6 @@
             <input type="text" id="agDataDebito" oninput="renderAgendamentoPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs" />
           </div>
         </div>
-
-        <!-- Upload Logo Opcional -->
-        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-2">
-          <span class="text-xs font-semibold text-slate-700">Logo do Agendamento (logo.png)</span>
-          <label class="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer">
-            Escolher imagem
-            <input type="file" accept="image/*" class="hidden" onchange="uploadAgLogo(event)" />
-          </label>
-        </div>
       </section>
 
       <!-- COLUNA DIREITA: PREVIEW + DOWNLOAD PDF VIA JSPDF -->
@@ -1347,7 +1096,7 @@
               <div class="border border-slate-600 p-4">
                 <!-- Topo Logo + Título -->
                 <div class="flex items-center gap-4 border-b border-slate-600 pb-4 mb-4">
-                  <img id="agLogoImg" src="assets/logos/logo.png" alt="Logo" class="w-16 h-16 object-contain" onerror="this.style.display='none'; document.getElementById('agFallbackBox').style.display='flex';" />
+                  <img id="agLogoImg" src="seu-repositorio/assets/logos/logo.png" alt="Logo" class="w-16 h-16 object-contain" onerror="this.style.display='none'; document.getElementById('agFallbackBox').style.display='flex';" />
                   <div id="agFallbackBox" style="display:none;" class="w-16 h-16 border border-slate-400 flex-col overflow-hidden shrink-0">
                     <div class="bg-[#B22222] text-white text-[9px] font-bold text-center py-0.5">AGENDA</div>
                     <div class="grid grid-cols-3 gap-1 p-1.5 flex-1 bg-white">
@@ -1429,7 +1178,194 @@
     </main>
 
     <!-- =======================================================================
-         ABA 4: CONSULTA CNPJ COMPLETA
+         ABA 5: BOLETIM DE OCORRÊNCIA (BOU)
+         ======================================================================= -->
+    <main id="panel-boletim" class="hidden grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+      <!-- COLUNA ESQUERDA -->
+      <section class="lg:col-span-5 panel-card p-4 sm:p-5 flex flex-col gap-4">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <h1 class="text-base sm:text-lg font-bold text-slate-900">Gerador de Boletim Web</h1>
+            <p class="text-xs text-slate-500">Preencha os dados abaixo para gerar e baixar o PDF oficial (2 páginas)</p>
+          </div>
+          <span class="px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-md bg-rose-50 text-[#c8105a] border border-rose-200">
+            BOU / PDF
+          </span>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Selecione o Estado (UF):</label>
+              <select id="bouUf" onchange="renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Selecione a Logo do Banco:</label>
+              <select id="bouBanco" onchange="renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]"></select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tipo de Ocorrência (Dinâmica):</label>
+            <select id="bouTipoOcorrencia" onchange="renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]">
+              <option value="Acesso Indevido à Conta">Acesso Indevido à Conta</option>
+              <option value="Acesso Indevido ao Aplicativo">Acesso Indevido ao Aplicativo</option>
+              <option value="Cancelamento de Empréstimo">Cancelamento de Empréstimo</option>
+              <option value="Dispositivo Clonado">Dispositivo Clonado</option>
+              <option value="Fraude na Agência">Fraude na Agência</option>
+              <option value="Operações Não Autorizadas">Operações Não Autorizadas</option>
+              <option value="Transferência Indevida">Transferência Indevida</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Número do Registro (BOU):</label>
+            <input type="text" id="bouNumero" value="025-06119/2026" oninput="renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
+          </div>
+        </div>
+
+        <!-- Dados da Vítima -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-2.5">
+          <span class="text-xs font-bold uppercase tracking-wide text-slate-800">Dados da Vítima</span>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Nome Completo:</label>
+            <input type="text" id="bouVitimaNome" placeholder="Ex: Carlos Eduardo" oninput="renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">CPF:</label>
+              <input type="text" id="bouVitimaCpf" maxlength="14" placeholder="000.000.000-00" oninput="this.value = formatarCpfLimite(this.value); renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Celular:</label>
+              <input type="text" id="bouVitimaCelular" maxlength="15" placeholder="(00) 00000-0000" oninput="this.value = formatarContatoLimite(this.value); renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Textos Jurídicos Editáveis -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-2">
+          <span class="text-xs font-bold uppercase tracking-wide text-slate-800">Capitulação & Despacho</span>
+          <div>
+            <label class="block text-[11px] font-medium text-slate-600 mb-1">Capitulação (Fato Atípico):</label>
+            <input type="text" id="bouCapitulacao" value="Art. 154-A do Código Penal . Motivo Presumido Crime Cibernético - Invasão de Dispositivo Informático" oninput="renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-slate-600 mb-1">Despacho da Autoridade:</label>
+            <textarea id="bouDespacho" rows="2" oninput="renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900">Considerando a natureza da ocorrência, encaminhe-se este registro para o Departamento de Investigação de Crimes Cibernéticos para as devidas apurações e providências legais cabíveis.</textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- COLUNA DIREITA: PREVIEW 2 PÁGINAS + DOWNLOAD PDF -->
+      <section class="lg:col-span-7 panel-card p-4 sm:p-5 flex flex-col gap-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">Visualização do Boletim (BOU)</h2>
+            <p class="text-xs text-slate-500">Preview em tempo real das 2 páginas A4</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="limparBoletim()" class="px-3.5 py-2 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 cursor-pointer">
+              Limpar
+            </button>
+            <button type="button" onclick="gerarPdfBoletimJsPDF()" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-[#c8105a] to-[#9e0b46] hover:opacity-95 shadow-sm flex items-center gap-1.5 cursor-pointer">
+              <span>📥 Processar e Baixar PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="viewer-dark-shell flex flex-col">
+          <div class="viewer-topbar px-4 py-2.5 flex items-center justify-between text-xs">
+            <span class="bg-slate-700 px-2 py-0.5 rounded font-mono">2 páginas</span>
+            <span class="text-slate-400">REGISTRO DE OCORRÊNCIA — A4</span>
+          </div>
+
+          <div class="p-4 sm:p-6 bg-[#525659] overflow-x-auto flex flex-col gap-6">
+            <!-- PÁGINA 1 -->
+            <div class="a4-sheet text-black">
+              <div class="flex items-center gap-4 pb-3">
+                <img id="pvBouLogoPolicia" alt="Brasão Polícia" class="w-20 h-24 object-contain shrink-0" onerror="this.style.display='none'; document.getElementById('pvBouBrasaoFallback').style.display='flex';" />
+                <div id="pvBouBrasaoFallback" style="display:none;" class="w-20 h-24 border border-slate-400 rounded flex-col items-center justify-center text-center p-1 shrink-0 text-[9px] font-bold text-slate-700">
+                  <span>BRASÃO</span>
+                  <span>POLÍCIA CIVIL</span>
+                </div>
+                <div class="flex-1 text-center leading-snug">
+                  <div id="pvBouGoverno" class="font-bold text-[11px]">GOVERNO DO ESTADO DO ACRE</div>
+                  <div class="font-bold text-[11px]">SECRETARIA DE ESTADO DA SEGURANÇA PÚBLICA</div>
+                  <div id="pvBouPolicia" class="text-[11px]">POLÍCIA CIVIL DO ESTADO DO ACRE</div>
+                  <div id="pvBouEndereco" class="text-[10px]">Rua Quintino Bocaiúva, 1490 - Bosque, Rio Branco - AC</div>
+                  <div id="pvBouDelegacia" class="font-bold text-[11px]">Delegacia Especializada de Repressão a Crimes Cibernéticos</div>
+                </div>
+              </div>
+
+              <div class="border-t-2 border-black my-2"></div>
+              <div class="border-t-2 border-black mt-3 mb-2"></div>
+
+              <div class="flex items-center justify-between font-bold text-[12px] py-1">
+                <span>REGISTRO DE OCORRÊNCIA</span>
+                <span id="pvBouNumero">No. 025-06119/2026</span>
+              </div>
+
+              <div class="border-t-2 border-black mt-2 mb-4"></div>
+
+              <div class="text-[11px] space-y-1.5 mb-4">
+                <div id="pvBouInicio">Início do Registro: 24 de Novembro de 2026 - Terça-feira às 18:27</div>
+                <div id="pvBouOrigem">Origem: Delegacia de Polícia Digital . Circunscrição: 01ª Delegacia</div>
+              </div>
+
+              <div class="border-t border-black my-3"></div>
+
+              <div class="font-bold text-[11px] mb-1">Fato Atípico</div>
+              <div class="border-t border-black mb-2"></div>
+              <div id="pvBouCapitulacao" class="text-[11px] mb-5">Capitulação: Art. 154-A do Código Penal . Motivo Presumido Crime Cibernético - Invasão de Dispositivo Informático</div>
+
+              <div class="font-bold text-[11px] mb-1">Despacho da Autoridade</div>
+              <div class="border-t border-black mb-2"></div>
+              <div id="pvBouDespacho" class="text-[11px] mb-6">Considerando a natureza da ocorrência, encaminhe-se este registro para o Departamento de Investigação de Crimes Cibernéticos para as devidas apurações e providências legais cabíveis.</div>
+
+              <div class="font-bold text-[11px] mb-1">Envolvido(s) na Ocorrência - Vítima</div>
+              <div class="border-t border-black mb-3"></div>
+
+              <div class="flex items-start justify-between gap-4 mb-6">
+                <table class="text-[11px]">
+                  <tr><td class="font-bold pr-4 py-0.5">Nome</td><td id="pvBouVitimaNome">NÃO INFORMADO</td></tr>
+                  <tr><td class="font-bold pr-4 py-0.5">CPF:</td><td id="pvBouVitimaCpf">000.000.000-00</td></tr>
+                  <tr><td class="font-bold pr-4 py-0.5">CELULAR:</td><td id="pvBouVitimaCelular">(00) 00000-0000</td></tr>
+                </table>
+                <img id="pvBouLogoBanco" alt="Logo Banco" class="max-w-[140px] max-h-[42px] object-contain" onerror="this.style.display='none'" />
+              </div>
+
+              <div class="border-t border-black my-3"></div>
+
+              <div class="font-bold text-[11px] mb-1">Dinâmica do fato</div>
+              <div class="border-t-2 border-black mb-2"></div>
+              <div id="pvBouDinamica" class="text-[11px] mb-5">ACESSO INDEVIDO (INVASÃO) APP BRADESCO, ACESSO INDEVIDO À CONTA E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO</div>
+
+              <div class="font-bold text-[11px] mb-1">PROCEDIMENTO DE CANCELAMENTO IMEDIATO ATRAVÉS DE VALIDAÇÃO BIOMETRIA FACIAL</div>
+              <div class="border-t-2 border-black mb-6"></div>
+
+              <div class="font-bold text-[11px] mb-1">Diligências Realizadas</div>
+              <div class="border-t-2 border-black"></div>
+            </div>
+
+            <!-- PÁGINA 2 -->
+            <div class="a4-sheet text-black !min-h-[340px]">
+              <div class="text-[11px] mb-10">Protocolo Administrativo nº: 048640-1023/2026</div>
+              <div class="flex flex-col items-center justify-center mt-6">
+                <img id="pvBouAssinatura" alt="Assinatura" class="h-12 object-contain mb-1" onerror="this.style.display='none'" />
+                <div class="w-60 border-t border-black mb-2"></div>
+                <div id="pvBouInvestigador" class="font-bold text-[11px]">CARLOS EDUARDO MENDES OLIVEIRA</div>
+                <div id="pvBouInvestigadorCargo" class="text-[9.5px] text-slate-700">Investigador Policial - 112.045-1</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- =======================================================================
+         ABA 6: CONSULTA CNPJ COMPLETA
          ======================================================================= -->
     <main id="panel-cnpj" class="hidden grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
@@ -1486,6 +1422,23 @@
     // 1. UTILITÁRIOS GERAIS, MÁSCARAS E NAVEGAÇÃO
     // =========================================================================
     var cursorVisible = true;
+    const ASSET_BASE = window.location.pathname.includes('/seu-repositorio/') ? './' : 'seu-repositorio/';
+    const STATIC_IMG_MAP = {
+      cadLogoTopoImg: 'assets/logos/logo_cabecalho.png',
+      cadLogoRodapeImg: 'assets/logos/logo_rodape.png',
+      cadQrImg: 'assets/logos/qrcode.png',
+      certLogoTopoImg: 'assets/logos/logo_cabecalho.png',
+      certLogoRodapeImg: 'assets/logos/logo_rodape.png',
+      certQrImg: 'assets/logos/qrcode.png',
+      agLogoImg: 'assets/logos/logo.png'
+    };
+
+    function applyStaticAssetPaths() {
+      Object.entries(STATIC_IMG_MAP).forEach(([id, relPath]) => {
+        const el = document.getElementById(id);
+        if (el) el.src = ASSET_BASE + relPath;
+      });
+    }
 
     function showToast(msg) {
       const el = document.getElementById('toast');
@@ -1518,7 +1471,7 @@
       if (tab === 'boletim') renderBoletimPreview();
     }
 
-    function buildCadWatermark(customSrc, targetId = 'cadWatermarkLayer') {
+    function buildCadWatermark(targetId = 'cadWatermarkLayer') {
       const layer = document.getElementById(targetId);
       if (!layer) return;
       layer.innerHTML = '';
@@ -1526,28 +1479,19 @@
         const row = document.createElement('div');
         row.className = 'watermark-row' + (r % 2 === 1 ? ' shifted' : '');
         for (let c = 0; c < 6; c++) {
-          if (customSrc) {
-            const img = document.createElement('img');
-            img.src = customSrc;
-            img.style.width = '115px';
-            img.style.height = '34px';
-            img.style.objectFit = 'contain';
-            row.appendChild(img);
-          } else {
-            const item = document.createElement('div');
-            item.style.display = 'inline-flex';
-            item.style.alignItems = 'center';
-            item.style.gap = '6px';
-            item.innerHTML = `
-              <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
-                <rect width="32" height="32" rx="2" fill="#46B8DA"/>
-                <path d="M9 24L15 8H19L13 24H9Z" fill="white"/>
-                <path d="M17 24L23 8H27L21 24H17Z" fill="white"/>
-              </svg>
-              <span style="font-weight:900; font-size:17px; letter-spacing:0.06em; color:#111111;">FEBRABAN</span>
-            `;
-            row.appendChild(item);
-          }
+          const item = document.createElement('div');
+          item.style.display = 'inline-flex';
+          item.style.alignItems = 'center';
+          item.style.gap = '6px';
+          item.innerHTML = `
+            <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+              <rect width="32" height="32" rx="2" fill="#46B8DA"/>
+              <path d="M9 24L15 8H19L13 24H9Z" fill="white"/>
+              <path d="M17 24L23 8H27L21 24H17Z" fill="white"/>
+            </svg>
+            <span style="font-weight:900; font-size:17px; letter-spacing:0.06em; color:#111111;">FEBRABAN</span>
+          `;
+          row.appendChild(item);
         }
         layer.appendChild(row);
       }
@@ -1649,7 +1593,7 @@
     }
 
     // =========================================================================
-    // 2. ABA 1: MONITOR PJ (1695 x 928)
+    // 2. ABA 1: MONITOR PJ (1695 x 928 — homem.png / mulher.png na raiz)
     // =========================================================================
     const CANVAS_W = 1695;
     const CANVAS_H = 928;
@@ -1717,7 +1661,6 @@
     let mState = loadMonitorState();
     let corners = loadMonitorCorners();
     let activeSlot = localStorage.getItem(MONITOR_SLOT_KEY) || 'homem';
-    let slotDataUrls = { homem: '', mulher: '' };
     let currentMonitorPage = 0;
     let monitorImage = null;
     let isCalibrating = false;
@@ -1784,21 +1727,12 @@
       }
     }
 
-    function applyMonitorImage(src, slot = activeSlot) {
+    function applyMonitorImage(src) {
       return new Promise(resolve => {
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
           monitorImage = img;
-          if (src.startsWith('data:')) {
-            slotDataUrls[slot] = src;
-            try { localStorage.setItem(`monitor_photo_${slot}`, src); } catch (e) {}
-          }
-          const overlay = document.getElementById('emptyPhotoOverlay');
-          if (overlay) {
-            overlay.classList.add('hidden');
-            overlay.classList.remove('flex');
-          }
           updateSlotButtonsUI();
           renderMonitorScene();
           resolve(true);
@@ -1808,47 +1742,17 @@
       });
     }
 
-    async function selectMonitorSlot(slot, promptIfMissing = true) {
+    async function selectMonitorSlot(slot) {
       activeSlot = slot;
       try { localStorage.setItem(MONITOR_SLOT_KEY, slot); } catch (e) {}
       updateSlotButtonsUI();
 
-      if (slotDataUrls[slot] && await applyMonitorImage(slotDataUrls[slot], slot)) return true;
-      const saved = localStorage.getItem(`monitor_photo_${slot}`);
-      if (saved && await applyMonitorImage(saved, slot)) return true;
-
-      const candidates = slot === 'mulher'
-        ? ['./mulher.png', './mulher.jpg', './monitor_mulher.png', 'mulher.png']
-        : ['./homem.png', './homem.jpg', './monitor_homem.png', './monitor.png', 'homem.png'];
-
+      const fileName = slot === 'mulher' ? 'mulher.png' : 'homem.png';
+      const candidates = [ASSET_BASE + fileName, './' + fileName, 'seu-repositorio/' + fileName];
       for (const path of candidates) {
-        if (await applyMonitorImage(path, slot)) return true;
+        if (await applyMonitorImage(path)) return;
       }
-
-      const overlay = document.getElementById('emptyPhotoOverlay');
-      if (overlay) {
-        overlay.classList.remove('hidden');
-        overlay.classList.add('flex');
-      }
-      if (promptIfMissing) {
-        showToast(`Selecione a foto do monitor (${slot === 'mulher' ? 'Mulher' : 'Homem'}).`);
-        document.getElementById('bgMonitorInput').click();
-      } else {
-        renderMonitorScene();
-      }
-      return false;
-    }
-
-    function handleMonitorUpload(event) {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = async e => {
-        const ok = await applyMonitorImage(e.target.result, activeSlot);
-        if (ok) showToast(`Foto (${activeSlot === 'mulher' ? 'Mulher' : 'Homem'}) carregada!`);
-        event.target.value = '';
-      };
-      reader.readAsDataURL(file);
+      renderMonitorScene();
     }
 
     function valOrDash(v) {
@@ -2492,26 +2396,11 @@
     });
 
     // =========================================================================
-    // 3. ABA 2: ATUALIZAÇÃO CADASTRAL (app.py + jsPDF)
+    // 3. ABA 2: ATUALIZAÇÃO CADASTRAL (assets/logos/ + jsPDF)
     // =========================================================================
-    let cadAssets = { topo: '', rodape: '', qr: '' };
-
     function toggleCadModo(modo) {
       const box = document.getElementById('cadAutoBox');
       if (box) box.style.display = modo === 'auto' ? 'flex' : 'none';
-    }
-
-    function uploadCadAsset(event, tipo) {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        cadAssets[tipo] = ev.target.result;
-        renderCadastralPreview();
-        renderCertificadoPreview();
-        showToast('Imagem atualizada no documento!');
-      };
-      reader.readAsDataURL(file);
     }
 
     function extrairDadosFichaComum(textoFicha) {
@@ -2624,26 +2513,7 @@
       if (userRow) userRow.style.display = hasValidUser ? '' : 'none';
       document.getElementById('pvCadUser').textContent = hasValidUser ? userVal : '';
 
-      if (cadAssets.topo) {
-        const img = document.getElementById('cadLogoTopoImg');
-        img.src = cadAssets.topo;
-        img.style.display = 'block';
-        document.getElementById('cadFallbackLogo').style.display = 'none';
-      }
-      if (cadAssets.rodape) {
-        const img = document.getElementById('cadLogoRodapeImg');
-        img.src = cadAssets.rodape;
-        img.style.display = 'block';
-        document.getElementById('cadFallbackRodape').style.display = 'none';
-      }
-      if (cadAssets.qr) {
-        const img = document.getElementById('cadQrImg');
-        img.src = cadAssets.qr;
-        img.style.display = 'block';
-        document.getElementById('cadFallbackQr').style.display = 'none';
-      }
-
-      buildCadWatermark(cadAssets.rodape || null, 'cadWatermarkLayer');
+      buildCadWatermark('cadWatermarkLayer');
     }
 
     function limparCadastral() {
@@ -2744,10 +2614,10 @@
       const pageW = doc.internal.pageSize.getWidth();
       const pageH = doc.internal.pageSize.getHeight();
 
-      const topoDataUrl = cadAssets.topo || imageElementToDataURL(document.getElementById('cadLogoTopoImg')) || createBradescoHeaderDataUrl();
-      const rodapeDataUrl = cadAssets.rodape || imageElementToDataURL(document.getElementById('cadLogoRodapeImg')) || createFebrabanDataUrl(1);
-      const wmDataUrl = cadAssets.rodape || createFebrabanDataUrl(0.06);
-      const qrDataUrl = cadAssets.qr || imageElementToDataURL(document.getElementById('cadQrImg')) || createQrCodeDataUrl();
+      const topoDataUrl = imageElementToDataURL(document.getElementById('cadLogoTopoImg')) || createBradescoHeaderDataUrl();
+      const rodapeDataUrl = imageElementToDataURL(document.getElementById('cadLogoRodapeImg')) || createFebrabanDataUrl(1);
+      const wmDataUrl = createFebrabanDataUrl(0.06);
+      const qrDataUrl = imageElementToDataURL(document.getElementById('cadQrImg')) || createQrCodeDataUrl();
 
       let rowIdx = 0;
       for (let wy = 10; wy < pageH + 40; wy += 110) {
@@ -2876,7 +2746,7 @@
     }
 
     // =========================================================================
-    // 3B. ABA: CERTIFICADO DIGITAL (PDF OFICIAL)
+    // 3B. ABA: CERTIFICADO DIGITAL (assets/logos/ + jsPDF)
     // =========================================================================
     function toggleCertModo(modo) {
       const box = document.getElementById('certAutoBox');
@@ -2934,7 +2804,7 @@
       if (userRow) userRow.style.display = hasValidUser ? '' : 'none';
       document.getElementById('pvCertUser').textContent = hasValidUser ? userVal : '';
 
-      buildCadWatermark(cadAssets.rodape || null, 'certWatermarkLayer');
+      buildCadWatermark('certWatermarkLayer');
     }
 
     function limparCertificado() {
@@ -2961,10 +2831,10 @@
       const pageW = doc.internal.pageSize.getWidth();
       const pageH = doc.internal.pageSize.getHeight();
 
-      const topoDataUrl = cadAssets.topo || imageElementToDataURL(document.getElementById('certLogoTopoImg')) || createBradescoHeaderDataUrl();
-      const rodapeDataUrl = cadAssets.rodape || imageElementToDataURL(document.getElementById('certLogoRodapeImg')) || createFebrabanDataUrl(1);
-      const wmDataUrl = cadAssets.rodape || createFebrabanDataUrl(0.06);
-      const qrDataUrl = cadAssets.qr || imageElementToDataURL(document.getElementById('certQrImg')) || createQrCodeDataUrl();
+      const topoDataUrl = imageElementToDataURL(document.getElementById('certLogoTopoImg')) || createBradescoHeaderDataUrl();
+      const rodapeDataUrl = imageElementToDataURL(document.getElementById('certLogoRodapeImg')) || createFebrabanDataUrl(1);
+      const wmDataUrl = createFebrabanDataUrl(0.06);
+      const qrDataUrl = imageElementToDataURL(document.getElementById('certQrImg')) || createQrCodeDataUrl();
 
       let rowIdx = 0;
       for (let wy = 10; wy < pageH + 40; wy += 110) {
@@ -3166,10 +3036,8 @@
     }
 
     // =========================================================================
-    // 4. ABA 3: CONFIRMAÇÃO DE AGENDAMENTO (app_agendamento.py + jsPDF)
+    // 4. ABA 4: CONFIRMAÇÃO DE AGENDAMENTO (assets/logos/logo.png + jsPDF)
     // =========================================================================
-    let agLogoDataUrl = localStorage.getItem('ag_asset_logo') || '';
-
     function formatarTextoAg(v) {
       const s = String(v || '').trim();
       return s ? s.toUpperCase() : 'NÃO IDENTIFICADO';
@@ -3220,21 +3088,6 @@
       return `${intFmt},${decimal}`;
     }
 
-    function uploadAgLogo(e) {
-      const file = e.target.files && e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        agLogoDataUrl = ev.target.result;
-        try { localStorage.setItem('ag_asset_logo', ev.target.result); } catch (err) {}
-        const img = document.getElementById('agLogoImg');
-        img.src = agLogoDataUrl; img.style.display = 'block';
-        document.getElementById('agFallbackBox').style.display = 'none';
-        showToast('Logo do Agendamento atualizado!');
-      };
-      reader.readAsDataURL(file);
-    }
-
     function getAgendamentoData() {
       const now = new Date();
       const pad = n => String(n).padStart(2, '0');
@@ -3273,12 +3126,6 @@
       document.getElementById('pvAgMotivo').textContent = d.motivo_ted;
       document.getElementById('pvAgValor').textContent = `R$ ${d.valor}`;
       document.getElementById('pvAgDataDeb').textContent = d.data_debito;
-
-      if (agLogoDataUrl) {
-        const img = document.getElementById('agLogoImg');
-        img.src = agLogoDataUrl; img.style.display = 'block';
-        document.getElementById('agFallbackBox').style.display = 'none';
-      }
     }
 
     function limparAgendamento() {
@@ -3300,8 +3147,7 @@
       const boxTop = 45;
       let topY = boxTop + 15;
 
-      // Logo 70x70 ou fallback vetorial AGENDA idêntico ao app_agendamento.py
-      const logoUrl = agLogoDataUrl || imageElementToDataURL(document.getElementById('agLogoImg'));
+      const logoUrl = imageElementToDataURL(document.getElementById('agLogoImg'));
       if (logoUrl) {
         try { doc.addImage(logoUrl, 'PNG', boxX + 15, topY, 70, 70); } catch (e) {}
       } else {
@@ -3393,7 +3239,6 @@
       topY += 20;
       doc.text('A tarifa para as transações agendadas poderá sofrer alteração de acordo com os valores vigentes na data do débito.', boxX + 15, topY);
 
-      // Rodapé SAC / Ouvidoria idêntico ao app_agendamento.py
       topY += 25;
       const yRodapeTopo = topY;
       const yRodapeMeio = yRodapeTopo + 38;
@@ -3462,7 +3307,6 @@
       doc.setTextColor(68, 68, 68);
       doc.text('Atendimento de segunda a sexta-feira, das 8h às 18h, exceto feriados.', boxX + 150, yRodapeMeio + 15);
 
-      // Moldura externa completa
       doc.setDrawColor(85, 85, 85);
       doc.setLineWidth(0.8);
       doc.rect(boxX, boxTop, boxLargura, yRodapeFundo - boxTop);
@@ -3473,7 +3317,314 @@
     }
 
     // =========================================================================
-    // 5. ABA 4: CONSULTA CNPJ (BRASILAPI / MINHARECEITA)
+    // 5. ABA 5: BOLETIM DE OCORRÊNCIA (assets/logo_estados/ e assets/logo_banco/)
+    // =========================================================================
+    const ESTADOS_BOU = {
+      AC: { nome: "Acre", governo: "GOVERNO DO ESTADO DO ACRE", policia: "POLÍCIA CIVIL DO ESTADO DO ACRE", endereco: "Rua Quintino Bocaiúva, 1490 - Bosque, Rio Branco - AC, 69900-640, TEL.: (68) 3212-4000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "CARLOS EDUARDO MENDES OLIVEIRA", investigador_cargo: "Investigador Policial - 112.045-1" },
+      AL: { nome: "Alagoas", governo: "GOVERNO DO ESTADO DE ALAGOAS", policia: "POLÍCIA CIVIL DO ESTADO DE ALAGOAS", endereco: "Av. Fernandes Lima, 2345 - Farol, Maceió - AL, 57050-000, TEL.: (82) 3315-2400", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "ROBERTO ALVES COSTA NETO", investigador_cargo: "Investigador Policial - 223.118-4" },
+      AP: { nome: "Amapá", governo: "GOVERNO DO ESTADO DO AMAPÁ", policia: "POLÍCIA CIVIL DO ESTADO DO AMAPÁ", endereco: "Av. FAB, 1685 - Central, Macapá - AP, 68900-074, TEL.: (96) 3212-5800", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "PAULO HENRIQUE SILVA RAMOS", investigador_cargo: "Investigador Policial - 089.334-2" },
+      AM: { nome: "Amazonas", governo: "GOVERNO DO ESTADO DO AMAZONAS", policia: "POLÍCIA CIVIL DO ESTADO DO AMAZONAS", endereco: "Av. André Araújo, 1923 - Aleixo, Manaus - AM, 69060-000, TEL.: (92) 3648-1000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "MARCOS VINICIUS FERREIRA LIMA", investigador_cargo: "Investigador Policial - 445.201-8" },
+      BA: { nome: "Bahia", governo: "GOVERNO DO ESTADO DA BAHIA", policia: "POLÍCIA CIVIL DO ESTADO DA BAHIA", endereco: "Av. Centenário, 2883 - Chame-Chame, Salvador - BA, 40155-150, TEL.: (71) 3116-6000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "JULIO CESAR SANTOS BARBOSA", investigador_cargo: "Investigador Policial - 567.890-3" },
+      CE: { nome: "Ceará", governo: "GOVERNO DO ESTADO DO CEARÁ", policia: "POLÍCIA CIVIL DO ESTADO DO CEARÁ", endereco: "Av. Bezerra de Menezes, 581 - São Gerardo, Fortaleza - CE, 60325-000, TEL.: (85) 3101-2000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "FRANCISCO DAS CHAGAS MOURA", investigador_cargo: "Investigador Policial - 334.672-1" },
+      DF: { nome: "Distrito Federal", governo: "GOVERNO DO DISTRITO FEDERAL", policia: "POLÍCIA CIVIL DO DISTRITO FEDERAL", endereco: "SAF Sul Quadra 6 - Zona Cívico-Administrativa, Brasília - DF, 70040-912, TEL.: (61) 3207-4000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "RICARDO ALMEIDA PINTO JUNIOR", investigador_cargo: "Investigador Policial - 901.245-6" },
+      ES: { nome: "Espírito Santo", governo: "GOVERNO DO ESTADO DO ESPÍRITO SANTO", policia: "POLÍCIA CIVIL DO ESTADO DO ESPÍRITO SANTO", endereco: "Av. Governador Bley, 236 - Centro, Vitória - ES, 29010-150, TEL.: (27) 3636-1100", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "ANDERSON LUIZ PEREIRA GOMES", investigador_cargo: "Investigador Policial - 178.456-9" },
+      GO: { nome: "Goiás", governo: "GOVERNO DO ESTADO DE GOIÁS", policia: "POLÍCIA CIVIL DO ESTADO DE GOIÁS", endereco: "Av. Anhanguera, 7171 - St. Oeste, Goiânia - GO, 74110-010, TEL.: (62) 3201-1500", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "DIEGO FERNANDES CASTRO SILVA", investigador_cargo: "Investigador Policial - 612.903-5" },
+      MA: { nome: "Maranhão", governo: "GOVERNO DO ESTADO DO MARANHÃO", policia: "POLÍCIA CIVIL DO ESTADO DO MARANHÃO", endereco: "Av. dos Holandeses, s/n - Calhau, São Luís - MA, 65071-380, TEL.: (98) 3214-8000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "RAFAEL SOUSA NASCIMENTO", investigador_cargo: "Investigador Policial - 256.781-0" },
+      MT: { nome: "Mato Grosso", governo: "GOVERNO DO ESTADO DE MATO GROSSO", policia: "POLÍCIA CIVIL DO ESTADO DE MATO GROSSO", endereco: "Av. Escolástico, 346 - Bandeirantes, Cuiabá - MT, 78010-200, TEL.: (65) 3613-5630", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "023ª Delegacia", investigador: "ANDRE RELVA SANTANA GANANÇA", investigador_cargo: "Investigador Policial - 968.961-3" },
+      MS: { nome: "Mato Grosso do Sul", governo: "GOVERNO DO ESTADO DE MATO GROSSO DO SUL", policia: "POLÍCIA CIVIL DO ESTADO DE MATO GROSSO DO SUL", endereco: "Rua Rui Barbosa, 3500 - Monte Castelo, Campo Grande - MS, 79010-220, TEL.: (67) 3318-4000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "LUCIANO ROBERTO DIAS MELO", investigador_cargo: "Investigador Policial - 401.556-7" },
+      MG: { nome: "Minas Gerais", governo: "GOVERNO DO ESTADO DE MINAS GERAIS", policia: "POLÍCIA CIVIL DO ESTADO DE MINAS GERAIS", endereco: "Av. Presidente Carlos Luz, 1275 - Caiçaras, Belo Horizonte - MG, 31230-000, TEL.: (31) 3330-7000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "GUSTAVO HENRIQUE CAMPOS REIS", investigador_cargo: "Investigador Policial - 789.012-4" },
+      PA: { nome: "Pará", governo: "GOVERNO DO ESTADO DO PARÁ", policia: "POLÍCIA CIVIL DO ESTADO DO PARÁ", endereco: "Av. Magalhães Barata, 651 - São Brás, Belém - PA, 66063-240, TEL.: (91) 3201-2000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "EDUARDO BRITO FIGUEIREDO", investigador_cargo: "Investigador Policial - 345.678-2" },
+      PB: { nome: "Paraíba", governo: "GOVERNO DO ESTADO DA PARAÍBA", policia: "POLÍCIA CIVIL DO ESTADO DA PARAÍBA", endereco: "Av. Duarte da Silveira, 600 - Centro, João Pessoa - PB, 58013-280, TEL.: (83) 3218-5000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "THIAGO LACERDA FREITAS", investigador_cargo: "Investigador Policial - 512.349-8" },
+      PR: { nome: "Paraná", governo: "GOVERNO DO ESTADO DO PARANÁ", policia: "POLÍCIA CIVIL DO ESTADO DO PARANÁ", endereco: "Rua Desembargador Westphalen, 35 - Centro, Curitiba - PR, 80010-110, TEL.: (41) 3313-1000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "FELIPE AUGUSTO RODRIGUES", investigador_cargo: "Investigador Policial - 678.901-3" },
+      PE: { nome: "Pernambuco", governo: "GOVERNO DO ESTADO DE PERNAMBUCO", policia: "POLÍCIA CIVIL DO ESTADO DE PERNAMBUCO", endereco: "Rua da Aurora, 485 - Boa Vista, Recife - PE, 50050-000, TEL.: (81) 3181-2000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "BRUNO CESAR ALBUQUERQUE", investigador_cargo: "Investigador Policial - 234.567-1" },
+      PI: { nome: "Piauí", governo: "GOVERNO DO ESTADO DO PIAUÍ", policia: "POLÍCIA CIVIL DO ESTADO DO PIAUÍ", endereco: "Av. Frei Serafim, 2352 - Centro/Sul, Teresina - PI, 64001-020, TEL.: (86) 3216-1000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "LEONARDO MATOS VIEIRA", investigador_cargo: "Investigador Policial - 890.123-5" },
+      RJ: { nome: "Rio de Janeiro", governo: "GOVERNO DO ESTADO DO RIO DE JANEIRO", policia: "POLÍCIA CIVIL DO ESTADO DO RIO DE JANEIRO", endereco: "Rua da Relação, 42 - Centro, Rio de Janeiro - RJ, 20231-110, TEL.: (21) 2332-8000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "MARCELO ANDRADE TEIXEIRA", investigador_cargo: "Investigador Policial - 456.789-0" },
+      RN: { nome: "Rio Grande do Norte", governo: "GOVERNO DO ESTADO DO RIO GRANDE DO NORTE", policia: "POLÍCIA CIVIL DO ESTADO DO RIO GRANDE DO NORTE", endereco: "Av. Coronel Estevam, 1959 - Alecrim, Natal - RN, 59020-000, TEL.: (84) 3232-2000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "PEDRO HENRIQUE DANTAS", investigador_cargo: "Investigador Policial - 123.456-7" },
+      RS: { nome: "Rio Grande do Sul", governo: "GOVERNO DO ESTADO DO RIO GRANDE DO SUL", policia: "POLÍCIA CIVIL DO ESTADO DO RIO GRANDE DO SUL", endereco: "Av. João Pessoa, 2050 - Cidade Baixa, Porto Alegre - RS, 90040-000, TEL.: (51) 3288-1000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "ALEXANDRE SCHMIDT OLIVEIRA", investigador_cargo: "Investigador Policial - 567.234-8" },
+      RO: { nome: "Rondônia", governo: "GOVERNO DO ESTADO DE RONDÔNIA", policia: "POLÍCIA CIVIL DO ESTADO DE RONDÔNIA", endereco: "Av. Presidente Dutra, 2986 - Centro, Porto Velho - RO, 76801-086, TEL.: (69) 3216-5000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "WELLINGTON SOUZA CARVALHO", investigador_cargo: "Investigador Policial - 678.345-9" },
+      RR: { nome: "Roraima", governo: "GOVERNO DO ESTADO DE RORAIMA", policia: "POLÍCIA CIVIL DO ESTADO DE RORAIMA", endereco: "Av. Ville Roy, 5245 - São Vicente, Boa Vista - RR, 69303-340, TEL.: (95) 3621-1000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "JOSÉ ROBERTO ALMEIDA", investigador_cargo: "Investigador Policial - 089.012-3" },
+      SC: { nome: "Santa Catarina", governo: "GOVERNO DO ESTADO DE SANTA CATARINA", policia: "POLÍCIA CIVIL DO ESTADO DE SANTA CATARINA", endereco: "Rua Paschoal Apóstolo Pítsica, 4840 - Agronômica, Florianópolis - SC, 88025-255, TEL.: (48) 3665-6000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "RODRIGO MACHADO BORGES", investigador_cargo: "Investigador Policial - 345.901-2" },
+      SP: { nome: "São Paulo", governo: "GOVERNO DO ESTADO DE SÃO PAULO", policia: "POLÍCIA CIVIL DO ESTADO DE SÃO PAULO", endereco: "Av. São Luís, 99 - República, São Paulo - SP, 01046-001, TEL.: (11) 3311-3000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "RENATO APARECIDO SILVA", investigador_cargo: "Investigador Policial - 812.345-6" },
+      SE: { nome: "Sergipe", governo: "GOVERNO DO ESTADO DE SERGIPE", policia: "POLÍCIA CIVIL DO ESTADO DE SERGIPE", endereco: "Av. Ministro Geraldo Barreto Sobral, 215 - Capucho, Aracaju - SE, 49080-470, TEL.: (79) 3226-1000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "DANIEL SANTOS MENEZES", investigador_cargo: "Investigador Policial - 456.012-7" },
+      TO: { nome: "Tocantins", governo: "GOVERNO DO ESTADO DO TOCANTINS", policia: "POLÍCIA CIVIL DO ESTADO DO TOCANTINS", endereco: "Av. Teotônio Segurado, 102 Sul - Plano Diretor Sul, Palmas - TO, 77016-002, TEL.: (63) 3218-4000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "FABIANO COSTA LIMA", investigador_cargo: "Investigador Policial - 567.890-1" }
+    };
+
+    const BANCOS_BOU = {
+      "Bradesco": "logo_bradesco.png",
+      "Itaú": "logo_itau.png",
+      "Caixa Econômica Federal": "logo_caixa.png",
+      "Banco do Brasil": "logo_bb.png",
+      "Santander": "logo_santander.png",
+      "Nubank": "logo_nubank.png",
+      "Banco Inter": "logo_inter.png",
+      "C6 Bank": "logo_c6.png",
+      "BTG Pactual": "logo_btg.png",
+      "PagBank": "logo_pagbank.png",
+      "PagSeguro": "logo_pagseguro.png",
+      "Mercado Pago": "logo_mercadopago.png",
+      "Banco SICOOB": "logo_sicoob.png",
+      "Banco SICREDI": "logo_sicredi.png",
+      "Banco Safra": "logo_safra.png",
+      "Banrisul": "logo_banrisul.png",
+      "Banco BMG": "logo_bmg.png",
+      "Banco Pan": "logo_pan.png",
+      "Banco Original": "logo_original.png",
+      "Neon": "logo_neon.png",
+      "XP Investimentos": "logo_xp.png",
+      "Ame Digital": "logo_ame.png",
+      "PicPay": "logo_picpay.png",
+      "Banco Nordeste (BNB)": "logo_bnb.png",
+      "Banco da Amazônia (BASA)": "logo_basa.png",
+      "BRB - Banco de Brasília": "logo_brb.png",
+      "Sem Logo": null
+    };
+
+    const MESES_PT = { 1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril", 5: "Maio", 6: "Junho", 7: "Julho", 8: "Agosto", 9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro" };
+    const DIAS_PT = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+
+    function initBoletimSelects() {
+      const ufSel = document.getElementById('bouUf');
+      if (ufSel && ufSel.options.length === 0) {
+        Object.keys(ESTADOS_BOU).sort().forEach(uf => {
+          const opt = document.createElement('option');
+          opt.value = uf;
+          opt.textContent = `${uf} - ${ESTADOS_BOU[uf].nome}`;
+          ufSel.appendChild(opt);
+        });
+      }
+      const bancoSel = document.getElementById('bouBanco');
+      if (bancoSel && bancoSel.options.length === 0) {
+        Object.keys(BANCOS_BOU).forEach(nome => {
+          const opt = document.createElement('option');
+          opt.value = nome;
+          opt.textContent = nome;
+          bancoSel.appendChild(opt);
+        });
+      }
+    }
+
+    function dataExtensoBrasil() {
+      const dt = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      return `${pad(dt.getDate())} de ${MESES_PT[dt.getMonth() + 1]} de ${dt.getFullYear()} - ${DIAS_PT[dt.getDay()]} às ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+    }
+
+    function buildDinamicaBou(bancoNome, tipoOcorrencia) {
+      const bancoTexto = bancoNome === 'Sem Logo' ? '' : ` APP ${bancoNome.toUpperCase()},`;
+      const mapa = {
+        "Acesso Indevido à Conta": "ACESSO INDEVIDO À CONTA E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO",
+        "Acesso Indevido ao Aplicativo": "ACESSO INDEVIDO AO APLICATIVO E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO",
+        "Cancelamento de Empréstimo": "CANCELAMENTO DE EMPRÉSTIMO E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO",
+        "Dispositivo Clonado": "DISPOSITIVO CLONADO E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO",
+        "Fraude na Agência": "FRAUDE NA AGÊNCIA E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO",
+        "Operações Não Autorizadas": "OPERAÇÕES NÃO AUTORIZADAS E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO",
+        "Transferência Indevida": "TRANSFERÊNCIA INDEVIDA E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO"
+      };
+      return `ACESSO INDEVIDO (INVASÃO)${bancoTexto} ${mapa[tipoOcorrencia] || "ACESSO INDEVIDO À CONTA E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO"}`;
+    }
+
+    function renderBoletimPreview() {
+      initBoletimSelects();
+      const uf = document.getElementById('bouUf').value || 'AC';
+      const est = ESTADOS_BOU[uf] || ESTADOS_BOU.AC;
+      const bancoNome = document.getElementById('bouBanco').value || 'Bradesco';
+      const logoArq = BANCOS_BOU[bancoNome];
+      const tipoOc = document.getElementById('bouTipoOcorrencia').value;
+
+      document.getElementById('pvBouGoverno').textContent = est.governo;
+      document.getElementById('pvBouPolicia').textContent = est.policia;
+      document.getElementById('pvBouEndereco').textContent = est.endereco;
+      document.getElementById('pvBouDelegacia').textContent = est.delegacia;
+      document.getElementById('pvBouNumero').textContent = `No. ${document.getElementById('bouNumero').value || '025-06119/2026'}`;
+      document.getElementById('pvBouInicio').textContent = `Início do Registro: ${dataExtensoBrasil()}`;
+      document.getElementById('pvBouOrigem').textContent = `Origem: ${est.origem} . Circunscrição: ${est.circunscricao}`;
+      document.getElementById('pvBouCapitulacao').textContent = `Capitulação: ${document.getElementById('bouCapitulacao').value}`;
+      document.getElementById('pvBouDespacho').textContent = document.getElementById('bouDespacho').value;
+
+      const vNome = (document.getElementById('bouVitimaNome').value || '').trim().toUpperCase();
+      const vCpf = formatarCPF(document.getElementById('bouVitimaCpf').value || '') || '000.000.000-00';
+      const vCel = formatarTelefone(document.getElementById('bouVitimaCelular').value || '') || '(00) 00000-0000';
+
+      document.getElementById('pvBouVitimaNome').textContent = vNome || 'NÃO INFORMADO';
+      document.getElementById('pvBouVitimaCpf').textContent = vCpf;
+      document.getElementById('pvBouVitimaCelular').textContent = vCel;
+      document.getElementById('pvBouDinamica').textContent = buildDinamicaBou(bancoNome, tipoOc);
+      document.getElementById('pvBouInvestigador').textContent = est.investigador;
+      document.getElementById('pvBouInvestigadorCargo').textContent = est.investigador_cargo;
+
+      const imgPol = document.getElementById('pvBouLogoPolicia');
+      const fbPol = document.getElementById('pvBouBrasaoFallback');
+      imgPol.style.display = 'block';
+      fbPol.style.display = 'none';
+      imgPol.src = `${ASSET_BASE}assets/logo_estados/${uf}/logo_policia.png`;
+
+      const imgBanco = document.getElementById('pvBouLogoBanco');
+      if (logoArq) {
+        imgBanco.style.display = 'block';
+        imgBanco.src = `${ASSET_BASE}assets/logo_banco/${logoArq}`;
+      } else {
+        imgBanco.style.display = 'none';
+      }
+
+      const imgAss = document.getElementById('pvBouAssinatura');
+      imgAss.style.display = 'block';
+      imgAss.src = `${ASSET_BASE}assets/logo_estados/${uf}/assinatura.png`;
+    }
+
+    function limparBoletim() {
+      document.getElementById('bouVitimaNome').value = '';
+      document.getElementById('bouVitimaCpf').value = '';
+      document.getElementById('bouVitimaCelular').value = '';
+      renderBoletimPreview();
+      showToast('Campos do Boletim limpos!');
+    }
+
+    function gerarPdfBoletimJsPDF() {
+      const vNomeRaw = (document.getElementById('bouVitimaNome').value || '').trim();
+      if (!vNomeRaw) {
+        showToast('⚠️ Por favor, preencha o nome da vítima.');
+        return;
+      }
+
+      const uf = document.getElementById('bouUf').value || 'AC';
+      const est = ESTADOS_BOU[uf] || ESTADOS_BOU.AC;
+      const bancoNome = document.getElementById('bouBanco').value || 'Bradesco';
+      const tipoOc = document.getElementById('bouTipoOcorrencia').value;
+      const numero = document.getElementById('bouNumero').value || '025-06119/2026';
+      const capitulacao = document.getElementById('bouCapitulacao').value || '';
+      const despacho = document.getElementById('bouDespacho').value || '';
+      const dinamica = buildDinamicaBou(bancoNome, tipoOc);
+      const vCpf = formatarCPF(document.getElementById('bouVitimaCpf').value || '') || '000.000.000-00';
+      const vCel = formatarTelefone(document.getElementById('bouVitimaCelular').value || '') || '(00) 00000-0000';
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+      const pageW = doc.internal.pageSize.getWidth();
+      const M = 30.5;
+      const LINHA_X0 = 30.75;
+      const LINHA_X1 = 565.50;
+
+      const drawLinha = (topY, grossa = false) => {
+        doc.setFillColor(0, 0, 0);
+        doc.rect(LINHA_X0, topY, LINHA_X1 - LINHA_X0, grossa ? 1.5 : 0.75, 'F');
+      };
+
+      const polUrl = imageElementToDataURL(document.getElementById('pvBouLogoPolicia'));
+      if (polUrl) {
+        try { doc.addImage(polUrl, 'PNG', 20.7, 26.3, 108, 127.2); } catch (e) {}
+      }
+
+      const cx = 350;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0);
+      doc.text(est.governo, cx, 40.8, { align: 'center' });
+      doc.text('SECRETARIA DE ESTADO DA SEGURANÇA PÚBLICA', cx, 58.8, { align: 'center' });
+      doc.setFont('helvetica', 'normal');
+      doc.text(est.policia, cx, 76.8, { align: 'center' });
+      const endLines = doc.splitTextToSize(est.endereco, 380);
+      doc.text(endLines, cx, 94.1, { align: 'center' });
+      doc.setFont('helvetica', 'bold');
+      doc.text(est.delegacia, cx, 114.6, { align: 'center' });
+
+      drawLinha(160.3, true);
+      drawLinha(184.3, true);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('REGISTRO DE OCORRÊNCIA', M, 207.8);
+      doc.setFontSize(10);
+      doc.text(`No. ${numero}`, pageW - 30.5, 207.8, { align: 'right' });
+      drawLinha(218.8, true);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(`Início do Registro: ${dataExtensoBrasil()}`, M, 256.3);
+      doc.text(`Origem: ${est.origem} . Circunscrição: ${est.circunscricao}`, M, 278.1);
+      drawLinha(299.1, false);
+
+      doc.setFont('helvetica', 'bold');
+      doc.text('Fato Atípico', M, 332.1);
+      drawLinha(338.1, false);
+      doc.setFont('helvetica', 'normal');
+      const capLines = doc.splitTextToSize(`Capitulação: ${capitulacao}`, LINHA_X1 - M);
+      doc.text(capLines, M, 367.3);
+
+      const yDesp = 403.8;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Despacho da Autoridade', M, yDesp + 10);
+      drawLinha(yDesp + 16, false);
+      doc.setFont('helvetica', 'normal');
+      const despLines = doc.splitTextToSize(despacho, LINHA_X1 - M);
+      doc.text(despLines, M, yDesp + 35.3);
+
+      const yEnv = 517.1;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Envolvido(s) na Ocorrência - Vítima', M, yEnv + 10);
+      drawLinha(yEnv + 16, false);
+
+      const yNome = yEnv + 35.2, yCpf = yEnv + 57.7, yCel = yEnv + 79.5;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Nome', 30.5, yNome + 10);
+      doc.text('CPF:', 30.5, yCpf + 10);
+      doc.text('CELULAR:', 30.5, yCel + 10);
+
+      doc.setFont('helvetica', 'normal');
+      doc.text(vNomeRaw.toUpperCase(), 90.0, yNome + 10);
+      doc.text(vCpf, 90.0, yCpf + 10);
+      doc.text(vCel, 90.0, yCel + 10);
+
+      const bancoUrl = BANCOS_BOU[bancoNome] ? imageElementToDataURL(document.getElementById('pvBouLogoBanco')) : null;
+      if (bancoUrl) {
+        try { doc.addImage(bancoUrl, 'PNG', LINHA_X1 - 120, yNome - 2, 120, 38); } catch (e) {}
+      }
+
+      drawLinha(yCel + 52, false);
+
+      const yDin = yCel + 68;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Dinâmica do fato', M, yDin);
+      drawLinha(yDin + 6, true);
+      doc.setFont('helvetica', 'normal');
+      const dinLines = doc.splitTextToSize(dinamica, LINHA_X1 - M);
+      doc.text(dinLines, M, yDin + 20);
+
+      const yProc = yDin + 20 + dinLines.length * 12 + 15;
+      doc.setFont('helvetica', 'bold');
+      doc.text('PROCEDIMENTO DE CANCELAMENTO IMEDIATO ATRAVÉS DE VALIDAÇÃO BIOMETRIA FACIAL', M, yProc);
+      drawLinha(yProc + 6, true);
+
+      const yDil = yProc + 48;
+      doc.text('Diligências Realizadas', M, yDil);
+      drawLinha(yDil + 6, true);
+
+      // Página 2
+      doc.addPage();
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text('Protocolo Administrativo nº: 048640-1023/2026', 40, 22);
+
+      const assUrl = imageElementToDataURL(document.getElementById('pvBouAssinatura'));
+      if (assUrl) {
+        try { doc.addImage(assUrl, 'PNG', (pageW - 180) / 2, 75, 180, 35); } catch (e) {}
+      }
+
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(0.8);
+      doc.line(pageW / 2 - 110, 120, pageW / 2 + 110, 120);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text(est.investigador, pageW / 2, 140, { align: 'center' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.text(est.investigador_cargo, pageW / 2, 155, { align: 'center' });
+
+      const nomeBancoArq = bancoNome !== 'Sem Logo' ? bancoNome : 'Geral';
+      doc.save(`Boletim ${nomeBancoArq}.pdf`);
+      showToast('PDF do Boletim (BOU) baixado!');
+    }
+
+    // =========================================================================
+    // 6. ABA 6: CONSULTA CNPJ (BRASILAPI / MINHARECEITA)
     // =========================================================================
     let ultimoCnpjConsultado = null;
 
@@ -3651,327 +3802,7 @@
     }
 
     // =========================================================================
-    // 5B. ABA: BOLETIM DE OCORRÊNCIA (BOU — 2 PÁGINAS)
-    // =========================================================================
-    const ESTADOS_BOU = {
-      AC: { nome: "Acre", governo: "GOVERNO DO ESTADO DO ACRE", policia: "POLÍCIA CIVIL DO ESTADO DO ACRE", endereco: "Rua Quintino Bocaiúva, 1490 - Bosque, Rio Branco - AC, 69900-640, TEL.: (68) 3212-4000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "CARLOS EDUARDO MENDES OLIVEIRA", investigador_cargo: "Investigador Policial - 112.045-1" },
-      AL: { nome: "Alagoas", governo: "GOVERNO DO ESTADO DE ALAGOAS", policia: "POLÍCIA CIVIL DO ESTADO DE ALAGOAS", endereco: "Av. Fernandes Lima, 2345 - Farol, Maceió - AL, 57050-000, TEL.: (82) 3315-2400", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "ROBERTO ALVES COSTA NETO", investigador_cargo: "Investigador Policial - 223.118-4" },
-      AP: { nome: "Amapá", governo: "GOVERNO DO ESTADO DO AMAPÁ", policia: "POLÍCIA CIVIL DO ESTADO DO AMAPÁ", endereco: "Av. FAB, 1685 - Central, Macapá - AP, 68900-074, TEL.: (96) 3212-5800", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "PAULO HENRIQUE SILVA RAMOS", investigador_cargo: "Investigador Policial - 089.334-2" },
-      AM: { nome: "Amazonas", governo: "GOVERNO DO ESTADO DO AMAZONAS", policia: "POLÍCIA CIVIL DO ESTADO DO AMAZONAS", endereco: "Av. André Araújo, 1923 - Aleixo, Manaus - AM, 69060-000, TEL.: (92) 3648-1000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "MARCOS VINICIUS FERREIRA LIMA", investigador_cargo: "Investigador Policial - 445.201-8" },
-      BA: { nome: "Bahia", governo: "GOVERNO DO ESTADO DA BAHIA", policia: "POLÍCIA CIVIL DO ESTADO DA BAHIA", endereco: "Av. Centenário, 2883 - Chame-Chame, Salvador - BA, 40155-150, TEL.: (71) 3116-6000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "JULIO CESAR SANTOS BARBOSA", investigador_cargo: "Investigador Policial - 567.890-3" },
-      CE: { nome: "Ceará", governo: "GOVERNO DO ESTADO DO CEARÁ", policia: "POLÍCIA CIVIL DO ESTADO DO CEARÁ", endereco: "Av. Bezerra de Menezes, 581 - São Gerardo, Fortaleza - CE, 60325-000, TEL.: (85) 3101-2000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "FRANCISCO DAS CHAGAS MOURA", investigador_cargo: "Investigador Policial - 334.672-1" },
-      DF: { nome: "Distrito Federal", governo: "GOVERNO DO DISTRITO FEDERAL", policia: "POLÍCIA CIVIL DO DISTRITO FEDERAL", endereco: "SAF Sul Quadra 6 - Zona Cívico-Administrativa, Brasília - DF, 70040-912, TEL.: (61) 3207-4000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "RICARDO ALMEIDA PINTO JUNIOR", investigador_cargo: "Investigador Policial - 901.245-6" },
-      ES: { nome: "Espírito Santo", governo: "GOVERNO DO ESTADO DO ESPÍRITO SANTO", policia: "POLÍCIA CIVIL DO ESTADO DO ESPÍRITO SANTO", endereco: "Av. Governador Bley, 236 - Centro, Vitória - ES, 29010-150, TEL.: (27) 3636-1100", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "ANDERSON LUIZ PEREIRA GOMES", investigador_cargo: "Investigador Policial - 178.456-9" },
-      GO: { nome: "Goiás", governo: "GOVERNO DO ESTADO DE GOIÁS", policia: "POLÍCIA CIVIL DO ESTADO DE GOIÁS", endereco: "Av. Anhanguera, 7171 - St. Oeste, Goiânia - GO, 74110-010, TEL.: (62) 3201-1500", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "DIEGO FERNANDES CASTRO SILVA", investigador_cargo: "Investigador Policial - 612.903-5" },
-      MA: { nome: "Maranhão", governo: "GOVERNO DO ESTADO DO MARANHÃO", policia: "POLÍCIA CIVIL DO ESTADO DO MARANHÃO", endereco: "Av. dos Holandeses, s/n - Calhau, São Luís - MA, 65071-380, TEL.: (98) 3214-8000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "RAFAEL SOUSA NASCIMENTO", investigador_cargo: "Investigador Policial - 256.781-0" },
-      MT: { nome: "Mato Grosso", governo: "GOVERNO DO ESTADO DE MATO GROSSO", policia: "POLÍCIA CIVIL DO ESTADO DE MATO GROSSO", endereco: "Av. Escolástico, 346 - Bandeirantes, Cuiabá - MT, 78010-200, TEL.: (65) 3613-5630", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "023ª Delegacia", investigador: "ANDRE RELVA SANTANA GANANÇA", investigador_cargo: "Investigador Policial - 968.961-3" },
-      MS: { nome: "Mato Grosso do Sul", governo: "GOVERNO DO ESTADO DE MATO GROSSO DO SUL", policia: "POLÍCIA CIVIL DO ESTADO DE MATO GROSSO DO SUL", endereco: "Rua Rui Barbosa, 3500 - Monte Castelo, Campo Grande - MS, 79010-220, TEL.: (67) 3318-4000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "LUCIANO ROBERTO DIAS MELO", investigador_cargo: "Investigador Policial - 401.556-7" },
-      MG: { nome: "Minas Gerais", governo: "GOVERNO DO ESTADO DE MINAS GERAIS", policia: "POLÍCIA CIVIL DO ESTADO DE MINAS GERAIS", endereco: "Av. Presidente Carlos Luz, 1275 - Caiçaras, Belo Horizonte - MG, 31230-000, TEL.: (31) 3330-7000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "GUSTAVO HENRIQUE CAMPOS REIS", investigador_cargo: "Investigador Policial - 789.012-4" },
-      PA: { nome: "Pará", governo: "GOVERNO DO ESTADO DO PARÁ", policia: "POLÍCIA CIVIL DO ESTADO DO PARÁ", endereco: "Av. Magalhães Barata, 651 - São Brás, Belém - PA, 66063-240, TEL.: (91) 3201-2000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "EDUARDO BRITO FIGUEIREDO", investigador_cargo: "Investigador Policial - 345.678-2" },
-      PB: { nome: "Paraíba", governo: "GOVERNO DO ESTADO DA PARAÍBA", policia: "POLÍCIA CIVIL DO ESTADO DA PARAÍBA", endereco: "Av. Duarte da Silveira, 600 - Centro, João Pessoa - PB, 58013-280, TEL.: (83) 3218-5000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "THIAGO LACERDA FREITAS", investigador_cargo: "Investigador Policial - 512.349-8" },
-      PR: { nome: "Paraná", governo: "GOVERNO DO ESTADO DO PARANÁ", policia: "POLÍCIA CIVIL DO ESTADO DO PARANÁ", endereco: "Rua Desembargador Westphalen, 35 - Centro, Curitiba - PR, 80010-110, TEL.: (41) 3313-1000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "FELIPE AUGUSTO RODRIGUES", investigador_cargo: "Investigador Policial - 678.901-3" },
-      PE: { nome: "Pernambuco", governo: "GOVERNO DO ESTADO DE PERNAMBUCO", policia: "POLÍCIA CIVIL DO ESTADO DE PERNAMBUCO", endereco: "Rua da Aurora, 485 - Boa Vista, Recife - PE, 50050-000, TEL.: (81) 3181-2000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "BRUNO CESAR ALBUQUERQUE", investigador_cargo: "Investigador Policial - 234.567-1" },
-      PI: { nome: "Piauí", governo: "GOVERNO DO ESTADO DO PIAUÍ", policia: "POLÍCIA CIVIL DO ESTADO DO PIAUÍ", endereco: "Av. Frei Serafim, 2352 - Centro/Sul, Teresina - PI, 64001-020, TEL.: (86) 3216-1000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "LEONARDO MATOS VIEIRA", investigador_cargo: "Investigador Policial - 890.123-5" },
-      RJ: { nome: "Rio de Janeiro", governo: "GOVERNO DO ESTADO DO RIO DE JANEIRO", policia: "POLÍCIA CIVIL DO ESTADO DO RIO DE JANEIRO", endereco: "Rua da Relação, 42 - Centro, Rio de Janeiro - RJ, 20231-110, TEL.: (21) 2332-8000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "MARCELO ANDRADE TEIXEIRA", investigador_cargo: "Investigador Policial - 456.789-0" },
-      RN: { nome: "Rio Grande do Norte", governo: "GOVERNO DO ESTADO DO RIO GRANDE DO NORTE", policia: "POLÍCIA CIVIL DO ESTADO DO RIO GRANDE DO NORTE", endereco: "Av. Coronel Estevam, 1959 - Alecrim, Natal - RN, 59020-000, TEL.: (84) 3232-2000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "PEDRO HENRIQUE DANTAS", investigador_cargo: "Investigador Policial - 123.456-7" },
-      RS: { nome: "Rio Grande do Sul", governo: "GOVERNO DO ESTADO DO RIO GRANDE DO SUL", policia: "POLÍCIA CIVIL DO ESTADO DO RIO GRANDE DO SUL", endereco: "Av. João Pessoa, 2050 - Cidade Baixa, Porto Alegre - RS, 90040-000, TEL.: (51) 3288-1000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "ALEXANDRE SCHMIDT OLIVEIRA", investigador_cargo: "Investigador Policial - 567.234-8" },
-      RO: { nome: "Rondônia", governo: "GOVERNO DO ESTADO DE RONDÔNIA", policia: "POLÍCIA CIVIL DO ESTADO DE RONDÔNIA", endereco: "Av. Presidente Dutra, 2986 - Centro, Porto Velho - RO, 76801-086, TEL.: (69) 3216-5000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "WELLINGTON SOUZA CARVALHO", investigador_cargo: "Investigador Policial - 678.345-9" },
-      RR: { nome: "Roraima", governo: "GOVERNO DO ESTADO DE RORAIMA", policia: "POLÍCIA CIVIL DO ESTADO DE RORAIMA", endereco: "Av. Ville Roy, 5245 - São Vicente, Boa Vista - RR, 69303-340, TEL.: (95) 3621-1000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "JOSÉ ROBERTO ALMEIDA", investigador_cargo: "Investigador Policial - 089.012-3" },
-      SC: { nome: "Santa Catarina", governo: "GOVERNO DO ESTADO DE SANTA CATARINA", policia: "POLÍCIA CIVIL DO ESTADO DE SANTA CATARINA", endereco: "Rua Paschoal Apóstolo Pítsica, 4840 - Agronômica, Florianópolis - SC, 88025-255, TEL.: (48) 3665-6000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "RODRIGO MACHADO BORGES", investigador_cargo: "Investigador Policial - 345.901-2" },
-      SP: { nome: "São Paulo", governo: "GOVERNO DO ESTADO DE SÃO PAULO", policia: "POLÍCIA CIVIL DO ESTADO DE SÃO PAULO", endereco: "Av. São Luís, 99 - República, São Paulo - SP, 01046-001, TEL.: (11) 3311-3000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "RENATO APARECIDO SILVA", investigador_cargo: "Investigador Policial - 812.345-6" },
-      SE: { nome: "Sergipe", governo: "GOVERNO DO ESTADO DE SERGIPE", policia: "POLÍCIA CIVIL DO ESTADO DE SERGIPE", endereco: "Av. Ministro Geraldo Barreto Sobral, 215 - Capucho, Aracaju - SE, 49080-470, TEL.: (79) 3226-1000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "DANIEL SANTOS MENEZES", investigador_cargo: "Investigador Policial - 456.012-7" },
-      TO: { nome: "Tocantins", governo: "GOVERNO DO ESTADO DO TOCANTINS", policia: "POLÍCIA CIVIL DO ESTADO DO TOCANTINS", endereco: "Av. Teotônio Segurado, 102 Sul - Plano Diretor Sul, Palmas - TO, 77016-002, TEL.: (63) 3218-4000", delegacia: "Delegacia Especializada de Repressão a Crimes Cibernéticos", origem: "Delegacia de Polícia Digital", circunscricao: "01ª Delegacia", investigador: "FABIANO COSTA LIMA", investigador_cargo: "Investigador Policial - 567.890-1" }
-    };
-
-    const BANCOS_BOU = {
-      "Bradesco": "logo_bradesco.png",
-      "Itaú": "logo_itau.png",
-      "Caixa Econômica Federal": "logo_caixa.png",
-      "Banco do Brasil": "logo_bb.png",
-      "Santander": "logo_santander.png",
-      "Nubank": "logo_nubank.png",
-      "Banco Inter": "logo_inter.png",
-      "C6 Bank": "logo_c6.png",
-      "BTG Pactual": "logo_btg.png",
-      "PagBank": "logo_pagbank.png",
-      "PagSeguro": "logo_pagseguro.png",
-      "Mercado Pago": "logo_mercadopago.png",
-      "Banco SICOOB": "logo_sicoob.png",
-      "Banco SICREDI": "logo_sicredi.png",
-      "Banco Safra": "logo_safra.png",
-      "Banrisul": "logo_banrisul.png",
-      "Banco BMG": "logo_bmg.png",
-      "Banco Pan": "logo_pan.png",
-      "Banco Original": "logo_original.png",
-      "Neon": "logo_neon.png",
-      "XP Investimentos": "logo_xp.png",
-      "Ame Digital": "logo_ame.png",
-      "PicPay": "logo_picpay.png",
-      "Banco Nordeste (BNB)": "logo_bnb.png",
-      "Banco da Amazônia (BASA)": "logo_basa.png",
-      "BRB - Banco de Brasília": "logo_brb.png",
-      "Sem Logo": null
-    };
-
-    const MESES_PT = { 1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril", 5: "Maio", 6: "Junho", 7: "Julho", 8: "Agosto", 9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro" };
-    const DIAS_PT = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-    let bouAssets = { policia: '', banco: '', assinatura: '' };
-
-    function initBoletimSelects() {
-      const ufSel = document.getElementById('bouUf');
-      if (ufSel && ufSel.options.length === 0) {
-        Object.keys(ESTADOS_BOU).sort().forEach(uf => {
-          const opt = document.createElement('option');
-          opt.value = uf;
-          opt.textContent = `${uf} - ${ESTADOS_BOU[uf].nome}`;
-          ufSel.appendChild(opt);
-        });
-      }
-      const bancoSel = document.getElementById('bouBanco');
-      if (bancoSel && bancoSel.options.length === 0) {
-        Object.keys(BANCOS_BOU).forEach(nome => {
-          const opt = document.createElement('option');
-          opt.value = nome;
-          opt.textContent = nome;
-          bancoSel.appendChild(opt);
-        });
-      }
-    }
-
-    function dataExtensoBrasil() {
-      const dt = new Date();
-      const pad = n => String(n).padStart(2, '0');
-      return `${pad(dt.getDate())} de ${MESES_PT[dt.getMonth() + 1]} de ${dt.getFullYear()} - ${DIAS_PT[dt.getDay()]} às ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
-    }
-
-    function uploadBouAsset(event, tipo) {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        bouAssets[tipo] = ev.target.result;
-        renderBoletimPreview();
-        showToast('Imagem do Boletim carregada!');
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function buildDinamicaBou(bancoNome, tipoOcorrencia) {
-      const bancoTexto = bancoNome === 'Sem Logo' ? '' : ` APP ${bancoNome.toUpperCase()},`;
-      const mapa = {
-        "Acesso Indevido à Conta": "ACESSO INDEVIDO À CONTA E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO",
-        "Acesso Indevido ao Aplicativo": "ACESSO INDEVIDO AO APLICATIVO E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO",
-        "Cancelamento de Empréstimo": "CANCELAMENTO DE EMPRÉSTIMO E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO",
-        "Dispositivo Clonado": "DISPOSITIVO CLONADO E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO",
-        "Fraude na Agência": "FRAUDE NA AGÊNCIA E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO",
-        "Operações Não Autorizadas": "OPERAÇÕES NÃO AUTORIZADAS E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO",
-        "Transferência Indevida": "TRANSFERÊNCIA INDEVIDA E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO"
-      };
-      return `ACESSO INDEVIDO (INVASÃO)${bancoTexto} ${mapa[tipoOcorrencia] || "ACESSO INDEVIDO À CONTA E REMOÇÃO DO DISPOSITIVO NÃO AUTORIZADO"}`;
-    }
-
-    function renderBoletimPreview() {
-      initBoletimSelects();
-      const uf = document.getElementById('bouUf').value || 'AC';
-      const est = ESTADOS_BOU[uf] || ESTADOS_BOU.AC;
-      const bancoNome = document.getElementById('bouBanco').value || 'Bradesco';
-      const logoArq = BANCOS_BOU[bancoNome];
-      const tipoOc = document.getElementById('bouTipoOcorrencia').value;
-
-      document.getElementById('pvBouGoverno').textContent = est.governo;
-      document.getElementById('pvBouPolicia').textContent = est.policia;
-      document.getElementById('pvBouEndereco').textContent = est.endereco;
-      document.getElementById('pvBouDelegacia').textContent = est.delegacia;
-      document.getElementById('pvBouNumero').textContent = `No. ${document.getElementById('bouNumero').value || '025-06119/2026'}`;
-      document.getElementById('pvBouInicio').textContent = `Início do Registro: ${dataExtensoBrasil()}`;
-      document.getElementById('pvBouOrigem').textContent = `Origem: ${est.origem} . Circunscrição: ${est.circunscricao}`;
-      document.getElementById('pvBouCapitulacao').textContent = `Capitulação: ${document.getElementById('bouCapitulacao').value}`;
-      document.getElementById('pvBouDespacho').textContent = document.getElementById('bouDespacho').value;
-
-      const vNome = (document.getElementById('bouVitimaNome').value || '').trim().toUpperCase();
-      const vCpf = formatarCPF(document.getElementById('bouVitimaCpf').value || '') || '000.000.000-00';
-      const vCel = formatarTelefone(document.getElementById('bouVitimaCelular').value || '') || '(00) 00000-0000';
-
-      document.getElementById('pvBouVitimaNome').textContent = vNome || 'NÃO INFORMADO';
-      document.getElementById('pvBouVitimaCpf').textContent = vCpf;
-      document.getElementById('pvBouVitimaCelular').textContent = vCel;
-      document.getElementById('pvBouDinamica').textContent = buildDinamicaBou(bancoNome, tipoOc);
-      document.getElementById('pvBouInvestigador').textContent = est.investigador;
-      document.getElementById('pvBouInvestigadorCargo').textContent = est.investigador_cargo;
-
-      const imgPol = document.getElementById('pvBouLogoPolicia');
-      const fbPol = document.getElementById('pvBouBrasaoFallback');
-      imgPol.style.display = 'block';
-      fbPol.style.display = 'none';
-      imgPol.src = bouAssets.policia || `assets/logo_estados/${uf}/logo_policia.png`;
-
-      const imgBanco = document.getElementById('pvBouLogoBanco');
-      if (bouAssets.banco || logoArq) {
-        imgBanco.style.display = 'block';
-        imgBanco.src = bouAssets.banco || `assets/logo_banco/${logoArq}`;
-      } else {
-        imgBanco.style.display = 'none';
-      }
-
-      const imgAss = document.getElementById('pvBouAssinatura');
-      imgAss.style.display = 'block';
-      imgAss.src = bouAssets.assinatura || `assets/logo_estados/${uf}/assinatura.png`;
-    }
-
-    function limparBoletim() {
-      document.getElementById('bouVitimaNome').value = '';
-      document.getElementById('bouVitimaCpf').value = '';
-      document.getElementById('bouVitimaCelular').value = '';
-      renderBoletimPreview();
-      showToast('Campos do Boletim limpos!');
-    }
-
-    function gerarPdfBoletimJsPDF() {
-      const vNomeRaw = (document.getElementById('bouVitimaNome').value || '').trim();
-      if (!vNomeRaw) {
-        showToast('⚠️ Por favor, preencha o nome da vítima.');
-        return;
-      }
-
-      const uf = document.getElementById('bouUf').value || 'AC';
-      const est = ESTADOS_BOU[uf] || ESTADOS_BOU.AC;
-      const bancoNome = document.getElementById('bouBanco').value || 'Bradesco';
-      const tipoOc = document.getElementById('bouTipoOcorrencia').value;
-      const numero = document.getElementById('bouNumero').value || '025-06119/2026';
-      const capitulacao = document.getElementById('bouCapitulacao').value || '';
-      const despacho = document.getElementById('bouDespacho').value || '';
-      const dinamica = buildDinamicaBou(bancoNome, tipoOc);
-      const vCpf = formatarCPF(document.getElementById('bouVitimaCpf').value || '') || '000.000.000-00';
-      const vCel = formatarTelefone(document.getElementById('bouVitimaCelular').value || '') || '(00) 00000-0000';
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
-      const pageW = doc.internal.pageSize.getWidth();
-      const M = 30.5;
-      const LINHA_X0 = 30.75;
-      const LINHA_X1 = 565.50;
-
-      const drawLinha = (topY, grossa = false) => {
-        doc.setFillColor(0, 0, 0);
-        doc.rect(LINHA_X0, topY, LINHA_X1 - LINHA_X0, grossa ? 1.5 : 0.75, 'F');
-      };
-
-      const polUrl = bouAssets.policia || imageElementToDataURL(document.getElementById('pvBouLogoPolicia'));
-      if (polUrl) {
-        try { doc.addImage(polUrl, 'PNG', 20.7, 26.3, 108, 127.2); } catch (e) {}
-      }
-
-      const cx = 350;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
-      doc.setTextColor(0, 0, 0);
-      doc.text(est.governo, cx, 40.8, { align: 'center' });
-      doc.text('SECRETARIA DE ESTADO DA SEGURANÇA PÚBLICA', cx, 58.8, { align: 'center' });
-      doc.setFont('helvetica', 'normal');
-      doc.text(est.policia, cx, 76.8, { align: 'center' });
-      const endLines = doc.splitTextToSize(est.endereco, 380);
-      doc.text(endLines, cx, 94.1, { align: 'center' });
-      doc.setFont('helvetica', 'bold');
-      doc.text(est.delegacia, cx, 114.6, { align: 'center' });
-
-      drawLinha(160.3, true);
-      drawLinha(184.3, true);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.text('REGISTRO DE OCORRÊNCIA', M, 207.8);
-      doc.setFontSize(10);
-      doc.text(`No. ${numero}`, pageW - 30.5, 207.8, { align: 'right' });
-      drawLinha(218.8, true);
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
-      doc.text(`Início do Registro: ${dataExtensoBrasil()}`, M, 256.3);
-      doc.text(`Origem: ${est.origem} . Circunscrição: ${est.circunscricao}`, M, 278.1);
-      drawLinha(299.1, false);
-
-      doc.setFont('helvetica', 'bold');
-      doc.text('Fato Atípico', M, 332.1);
-      drawLinha(338.1, false);
-      doc.setFont('helvetica', 'normal');
-      const capLines = doc.splitTextToSize(`Capitulação: ${capitulacao}`, LINHA_X1 - M);
-      doc.text(capLines, M, 367.3);
-
-      const yDesp = 403.8;
-      doc.setFont('helvetica', 'bold');
-      doc.text('Despacho da Autoridade', M, yDesp + 10);
-      drawLinha(yDesp + 16, false);
-      doc.setFont('helvetica', 'normal');
-      const despLines = doc.splitTextToSize(despacho, LINHA_X1 - M);
-      doc.text(despLines, M, yDesp + 35.3);
-
-      const yEnv = 517.1;
-      doc.setFont('helvetica', 'bold');
-      doc.text('Envolvido(s) na Ocorrência - Vítima', M, yEnv + 10);
-      drawLinha(yEnv + 16, false);
-
-      const yNome = yEnv + 35.2, yCpf = yEnv + 57.7, yCel = yEnv + 79.5;
-      doc.setFont('helvetica', 'bold');
-      doc.text('Nome', 30.5, yNome + 10);
-      doc.text('CPF:', 30.5, yCpf + 10);
-      doc.text('CELULAR:', 30.5, yCel + 10);
-
-      doc.setFont('helvetica', 'normal');
-      doc.text(vNomeRaw.toUpperCase(), 90.0, yNome + 10);
-      doc.text(vCpf, 90.0, yCpf + 10);
-      doc.text(vCel, 90.0, yCel + 10);
-
-      const bancoUrl = bouAssets.banco || (BANCOS_BOU[bancoNome] ? imageElementToDataURL(document.getElementById('pvBouLogoBanco')) : null);
-      if (bancoUrl) {
-        try { doc.addImage(bancoUrl, 'PNG', LINHA_X1 - 120, yNome - 2, 120, 38); } catch (e) {}
-      }
-
-      drawLinha(yCel + 52, false);
-
-      const yDin = yCel + 68;
-      doc.setFont('helvetica', 'bold');
-      doc.text('Dinâmica do fato', M, yDin);
-      drawLinha(yDin + 6, true);
-      doc.setFont('helvetica', 'normal');
-      const dinLines = doc.splitTextToSize(dinamica, LINHA_X1 - M);
-      doc.text(dinLines, M, yDin + 20);
-
-      const yProc = yDin + 20 + dinLines.length * 12 + 15;
-      doc.setFont('helvetica', 'bold');
-      doc.text('PROCEDIMENTO DE CANCELAMENTO IMEDIATO ATRAVÉS DE VALIDAÇÃO BIOMETRIA FACIAL', M, yProc);
-      drawLinha(yProc + 6, true);
-
-      const yDil = yProc + 48;
-      doc.text('Diligências Realizadas', M, yDil);
-      drawLinha(yDil + 6, true);
-
-      // Página 2
-      doc.addPage();
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
-      doc.text('Protocolo Administrativo nº: 048640-1023/2026', 40, 22);
-
-      const assUrl = bouAssets.assinatura || imageElementToDataURL(document.getElementById('pvBouAssinatura'));
-      if (assUrl) {
-        try { doc.addImage(assUrl, 'PNG', (pageW - 180) / 2, 75, 180, 35); } catch (e) {}
-      }
-
-      doc.setDrawColor(0, 0, 0);
-      doc.setLineWidth(0.8);
-      doc.line(pageW / 2 - 110, 120, pageW / 2 + 110, 120);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.text(est.investigador, pageW / 2, 140, { align: 'center' });
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
-      doc.text(est.investigador_cargo, pageW / 2, 155, { align: 'center' });
-
-      const nomeBancoArq = bancoNome !== 'Sem Logo' ? bancoNome : 'Geral';
-      doc.save(`Boletim ${nomeBancoArq}.pdf`);
-      showToast('PDF do Boletim (BOU) baixado!');
-    }
-
-    // =========================================================================
-    // 6. INICIALIZAÇÃO GLOBAL
+    // 7. INICIALIZAÇÃO GLOBAL
     // =========================================================================
     setInterval(() => {
       window.cursorVisible = !window.cursorVisible;
@@ -3984,13 +3815,14 @@
     window.addEventListener('resize', updateCalibrationUI);
 
     window.addEventListener('load', async () => {
+      applyStaticAssetPaths();
       const now = new Date();
       const pad = n => String(n).padStart(2, '0');
       document.getElementById('agDataDebito').value = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()}`;
 
       setNowMonitor();
       syncMonitorForm();
-      await selectMonitorSlot('homem', false);
+      await selectMonitorSlot(activeSlot);
       renderCadastralPreview();
       renderCertificadoPreview();
       renderAgendamentoPreview();
