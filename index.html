@@ -707,7 +707,7 @@
                 <!-- Rodapé Institucional FEBRABAN + QR Code -->
                 <div class="flex items-center justify-center gap-10 pt-2">
                   <div>
-                    <img id="cadLogoRodapeImg" src="seu-repositorio/assets/logos/logo_rodape.png" alt="FEBRABAN" class="h-12 object-contain" onerror="this.style.display='none'; document.getElementById('cadFallbackRodape').style.display='flex';" />
+                    <img id="cadLogoRodapeImg" src="seu-repositorio/assets/logos/logo_rodape.png" alt="FEBRABAN" class="h-14 w-auto max-w-[200px] object-contain" onerror="this.style.display='none'; document.getElementById('cadFallbackRodape').style.display='flex';" />
                     <div id="cadFallbackRodape" style="display:none;" class="items-center gap-2">
                       <svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect width="32" height="32" rx="2" fill="#46B8DA"/>
@@ -942,7 +942,7 @@
                 <!-- Rodapé Institucional FEBRABAN + QR Code -->
                 <div class="flex items-center justify-center gap-10 pt-1">
                   <div>
-                    <img id="certLogoRodapeImg" src="seu-repositorio/assets/logos/logo_rodape.png" alt="FEBRABAN" class="h-11 object-contain" onerror="this.style.display='none'; document.getElementById('certFallbackRodape').style.display='flex';" />
+                    <img id="certLogoRodapeImg" src="seu-repositorio/assets/logos/logo_rodape.png" alt="FEBRABAN" class="h-14 w-auto max-w-[200px] object-contain" onerror="this.style.display='none'; document.getElementById('certFallbackRodape').style.display='flex';" />
                     <div id="certFallbackRodape" style="display:none;" class="items-center gap-2">
                       <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect width="32" height="32" rx="2" fill="#46B8DA"/>
@@ -1096,7 +1096,7 @@
               <div class="border border-slate-600 p-4">
                 <!-- Topo Logo + Título -->
                 <div class="flex items-center gap-4 border-b border-slate-600 pb-4 mb-4">
-                  <img id="agLogoImg" src="seu-repositorio/assets/logos/logo.png" alt="Logo" class="w-16 h-16 object-contain" onerror="this.style.display='none'; document.getElementById('agFallbackBox').style.display='flex';" />
+                  <img id="agLogoImg" src="seu-repositorio/assets/logos/logo.png" alt="Logo" class="w-16 h-16 object-contain" onerror="handleAgLogoFallback(this)" />
                   <div id="agFallbackBox" style="display:none;" class="w-16 h-16 border border-slate-400 flex-col overflow-hidden shrink-0">
                     <div class="bg-[#B22222] text-white text-[9px] font-bold text-center py-0.5">AGENDA</div>
                     <div class="grid grid-cols-3 gap-1 p-1.5 flex-1 bg-white">
@@ -1422,6 +1422,24 @@
     // 1. UTILITÁRIOS GERAIS, MÁSCARAS E NAVEGAÇÃO
     // =========================================================================
     var cursorVisible = true;
+
+    function isValidUsuarioValue(v) {
+      if (v === null || v === undefined) return false;
+      const clean = String(v).trim();
+      if (!clean) return false;
+      const low = clean.toLowerCase();
+      return !['null', 'none', 'nan', 'undefined', '-', '--', 'n/a', 'na', 'não informado', 'nao informado', 'sem usuario', 'sem usuário'].includes(low);
+    }
+
+    function isValidEmailValue(v) {
+      if (!v) return false;
+      const low = String(v).trim().toLowerCase();
+      return !['none', 'null', 'nan', '-', '--', 'n/a', 'não informado', 'nao informado'].includes(low);
+    }
+
+    window.isValidUsuarioValue = isValidUsuarioValue;
+    window.isValidEmailValue = isValidEmailValue;
+
     const ASSET_BASE = window.location.pathname.includes('/seu-repositorio/') ? './' : 'seu-repositorio/';
     const STATIC_IMG_MAP = {
       cadLogoTopoImg: 'assets/logos/logo_cabecalho.png',
@@ -1433,10 +1451,34 @@
       agLogoImg: 'assets/logos/logo.png'
     };
 
+    const AG_LOGO_CANDIDATES = [
+      'assets/logos/logo.png',
+      'assets/logos/logo.jpg',
+      'assets/logos/logo.jpeg',
+      'assets/logo.png',
+      'assets/logos/logo_cabecalho.png',
+      'logo.png'
+    ];
+
+    function handleAgLogoFallback(imgEl) {
+      const idx = parseInt(imgEl.getAttribute('data-try-idx') || '0', 10) + 1;
+      if (idx < AG_LOGO_CANDIDATES.length) {
+        imgEl.setAttribute('data-try-idx', String(idx));
+        imgEl.src = ASSET_BASE + AG_LOGO_CANDIDATES[idx];
+      } else {
+        imgEl.style.display = 'none';
+        const fb = document.getElementById('agFallbackBox');
+        if (fb) fb.style.display = 'flex';
+      }
+    }
+
     function applyStaticAssetPaths() {
       Object.entries(STATIC_IMG_MAP).forEach(([id, relPath]) => {
         const el = document.getElementById(id);
-        if (el) el.src = ASSET_BASE + relPath;
+        if (el) {
+          el.setAttribute('data-try-idx', '0');
+          el.src = ASSET_BASE + relPath;
+        }
       });
     }
 
@@ -1578,18 +1620,20 @@
       }
     }
 
-    function isValidUsuarioValue(v) {
-      if (v === null || v === undefined) return false;
-      const clean = String(v).trim();
-      if (!clean) return false;
-      const low = clean.toLowerCase();
-      return !['null', 'none', 'nan', 'undefined', '-', '--', 'n/a', 'na', 'não informado', 'nao informado', 'sem usuario', 'sem usuário'].includes(low);
-    }
-
-    function isValidEmailValue(v) {
-      if (!v) return false;
-      const low = String(v).trim().toLowerCase();
-      return !['none', 'null', 'nan', '-', '--', 'n/a', 'não informado', 'nao informado'].includes(low);
+    function addImageFitAspect(doc, dataUrl, imgEl, x, y, maxW, maxH, align = 'left') {
+      if (!dataUrl) return;
+      let w = maxW;
+      let h = maxH;
+      if (imgEl && imgEl.naturalWidth > 0 && imgEl.naturalHeight > 0) {
+        const scale = Math.min(maxW / imgEl.naturalWidth, maxH / imgEl.naturalHeight);
+        w = imgEl.naturalWidth * scale;
+        h = imgEl.naturalHeight * scale;
+      }
+      let drawX = x;
+      if (align === 'right') drawX = x + (maxW - w);
+      else if (align === 'center') drawX = x + (maxW - w) / 2;
+      const offsetY = y + (maxH - h) / 2;
+      try { doc.addImage(dataUrl, 'PNG', drawX, offsetY, w, h); } catch (e) {}
     }
 
     // =========================================================================
@@ -2614,10 +2658,14 @@
       const pageW = doc.internal.pageSize.getWidth();
       const pageH = doc.internal.pageSize.getHeight();
 
-      const topoDataUrl = imageElementToDataURL(document.getElementById('cadLogoTopoImg')) || createBradescoHeaderDataUrl();
-      const rodapeDataUrl = imageElementToDataURL(document.getElementById('cadLogoRodapeImg')) || createFebrabanDataUrl(1);
+      const topoEl = document.getElementById('cadLogoTopoImg');
+      const rodapeEl = document.getElementById('cadLogoRodapeImg');
+      const qrEl = document.getElementById('cadQrImg');
+
+      const topoDataUrl = imageElementToDataURL(topoEl) || createBradescoHeaderDataUrl();
+      const rodapeDataUrl = imageElementToDataURL(rodapeEl) || createFebrabanDataUrl(1);
       const wmDataUrl = createFebrabanDataUrl(0.06);
-      const qrDataUrl = imageElementToDataURL(document.getElementById('cadQrImg')) || createQrCodeDataUrl();
+      const qrDataUrl = imageElementToDataURL(qrEl) || createQrCodeDataUrl();
 
       let rowIdx = 0;
       for (let wy = 10; wy < pageH + 40; wy += 110) {
@@ -2628,7 +2676,7 @@
         rowIdx++;
       }
 
-      try { doc.addImage(topoDataUrl, 'PNG', 45, 38, 185, 52); } catch (e) {}
+      addImageFitAspect(doc, topoDataUrl, topoEl, 45, 36, 185, 56, 'left');
       doc.setDrawColor(176, 176, 176);
       doc.setLineWidth(1);
       doc.line(242, 38, 242, 92);
@@ -2731,8 +2779,8 @@
       });
 
       y += 18;
-      try { doc.addImage(rodapeDataUrl, 'PNG', 155, y + 32, 130, 31); } catch (e) {}
-      try { doc.addImage(qrDataUrl, 'PNG', 308, y, 86, 86); } catch (e) {}
+      addImageFitAspect(doc, rodapeDataUrl, rodapeEl, 140, y + 18, 150, 56, 'right');
+      addImageFitAspect(doc, qrDataUrl, qrEl, 308, y, 86, 86, 'center');
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
@@ -2831,10 +2879,14 @@
       const pageW = doc.internal.pageSize.getWidth();
       const pageH = doc.internal.pageSize.getHeight();
 
-      const topoDataUrl = imageElementToDataURL(document.getElementById('certLogoTopoImg')) || createBradescoHeaderDataUrl();
-      const rodapeDataUrl = imageElementToDataURL(document.getElementById('certLogoRodapeImg')) || createFebrabanDataUrl(1);
+      const topoEl = document.getElementById('certLogoTopoImg');
+      const rodapeEl = document.getElementById('certLogoRodapeImg');
+      const qrEl = document.getElementById('certQrImg');
+
+      const topoDataUrl = imageElementToDataURL(topoEl) || createBradescoHeaderDataUrl();
+      const rodapeDataUrl = imageElementToDataURL(rodapeEl) || createFebrabanDataUrl(1);
       const wmDataUrl = createFebrabanDataUrl(0.06);
-      const qrDataUrl = imageElementToDataURL(document.getElementById('certQrImg')) || createQrCodeDataUrl();
+      const qrDataUrl = imageElementToDataURL(qrEl) || createQrCodeDataUrl();
 
       let rowIdx = 0;
       for (let wy = 10; wy < pageH + 40; wy += 110) {
@@ -2845,7 +2897,7 @@
         rowIdx++;
       }
 
-      try { doc.addImage(topoDataUrl, 'PNG', 45, 34, 175, 48); } catch (e) {}
+      addImageFitAspect(doc, topoDataUrl, topoEl, 45, 34, 175, 50, 'left');
       doc.setDrawColor(176, 176, 176);
       doc.setLineWidth(1);
       doc.line(232, 34, 232, 84);
@@ -3022,8 +3074,8 @@
       y += p4.length * 12 + 12;
 
       const footerY = Math.min(y, pageH - 110);
-      try { doc.addImage(rodapeDataUrl, 'PNG', 165, footerY + 22, 120, 28); } catch (e) {}
-      try { doc.addImage(qrDataUrl, 'PNG', 310, footerY, 74, 74); } catch (e) {}
+      addImageFitAspect(doc, rodapeDataUrl, rodapeEl, 145, footerY + 12, 145, 52, 'right');
+      addImageFitAspect(doc, qrDataUrl, qrEl, 310, footerY, 74, 74, 'center');
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(7.5);
