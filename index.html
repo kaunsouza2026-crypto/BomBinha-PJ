@@ -573,6 +573,19 @@
           <button type="button" onclick="processarFichaCadastral()" class="w-full py-2 px-3 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-[#c8105a] to-[#9e0b46] hover:opacity-95 cursor-pointer">
             Processar Ficha
           </button>
+
+          <!-- Seletor de múltiplos usuários (Atualização Cadastral) -->
+          <div id="cadMultiUsuarioBox" class="hidden pt-2 border-t border-dashed border-slate-300 flex-col gap-1.5">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="font-bold text-amber-700">Escolher Usuário (<span id="cadMultiUsuarioCount">0</span>)</span>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="selecionarTodosUsuariosDoc('cadastral')" class="text-sky-600 font-semibold hover:underline cursor-pointer">Todos</button>
+                <span class="text-slate-300">|</span>
+                <button type="button" onclick="selecionarUsuarioDoc('cadastral', '')" class="text-slate-500 hover:underline cursor-pointer">Deixar sem</button>
+              </div>
+            </div>
+            <div id="cadMultiUsuarioList" class="flex flex-wrap gap-1.5"></div>
+          </div>
         </div>
 
         <!-- Dados para o PDF -->
@@ -774,6 +787,19 @@
           <button type="button" onclick="processarFichaCertificado()" class="w-full py-2 px-3 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-[#c8105a] to-[#9e0b46] hover:opacity-95 cursor-pointer">
             Processar Ficha
           </button>
+
+          <!-- Seletor de múltiplos usuários (Certificado Digital) -->
+          <div id="certMultiUsuarioBox" class="hidden pt-2 border-t border-dashed border-slate-300 flex-col gap-1.5">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="font-bold text-amber-700">Escolher Usuário (<span id="certMultiUsuarioCount">0</span>)</span>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="selecionarTodosUsuariosDoc('certificado')" class="text-sky-600 font-semibold hover:underline cursor-pointer">Todos</button>
+                <span class="text-slate-300">|</span>
+                <button type="button" onclick="selecionarUsuarioDoc('certificado', '')" class="text-slate-500 hover:underline cursor-pointer">Deixar sem</button>
+              </div>
+            </div>
+            <div id="certMultiUsuarioList" class="flex flex-wrap gap-1.5"></div>
+          </div>
         </div>
 
         <!-- Dados para o PDF -->
@@ -1433,7 +1459,9 @@
 
     function isValidEmailValue(v) {
       if (!v) return false;
-      const low = String(v).trim().toLowerCase();
+      const clean = String(v).trim();
+      if (!clean || !clean.includes('@')) return false;
+      const low = clean.toLowerCase();
       return !['none', 'null', 'nan', '-', '--', 'n/a', 'não informado', 'nao informado'].includes(low);
     }
 
@@ -1475,10 +1503,7 @@
     function applyStaticAssetPaths() {
       Object.entries(STATIC_IMG_MAP).forEach(([id, relPath]) => {
         const el = document.getElementById(id);
-        if (el) {
-          el.setAttribute('data-try-idx', '0');
-          el.src = ASSET_BASE + relPath;
-        }
+        if (el) el.src = ASSET_BASE + relPath;
       });
     }
 
@@ -1622,22 +1647,29 @@
 
     function addImageFitAspect(doc, dataUrl, imgEl, x, y, maxW, maxH, align = 'left') {
       if (!dataUrl) return;
-      let w = maxW;
-      let h = maxH;
-      if (imgEl && imgEl.naturalWidth > 0 && imgEl.naturalHeight > 0) {
-        const scale = Math.min(maxW / imgEl.naturalWidth, maxH / imgEl.naturalHeight);
-        w = imgEl.naturalWidth * scale;
-        h = imgEl.naturalHeight * scale;
+      let drawW = maxW;
+      let drawH = maxH;
+      if (imgEl && imgEl.naturalWidth && imgEl.naturalHeight) {
+        const ratio = imgEl.naturalWidth / imgEl.naturalHeight;
+        if (maxW / maxH > ratio) {
+          drawH = maxH;
+          drawW = maxH * ratio;
+        } else {
+          drawW = maxW;
+          drawH = maxW / ratio;
+        }
       }
       let drawX = x;
-      if (align === 'right') drawX = x + (maxW - w);
-      else if (align === 'center') drawX = x + (maxW - w) / 2;
-      const offsetY = y + (maxH - h) / 2;
-      try { doc.addImage(dataUrl, 'PNG', drawX, offsetY, w, h); } catch (e) {}
+      if (align === 'right') drawX = x + (maxW - drawW);
+      else if (align === 'center') drawX = x + (maxW - drawW) / 2;
+      const drawY = y + (maxH - drawH) / 2;
+      try {
+        doc.addImage(dataUrl, 'PNG', drawX, drawY, drawW, drawH);
+      } catch (e) {}
     }
 
     // =========================================================================
-    // 2. ABA 1: MONITOR PJ (1695 x 928 — homem.png / mulher.png na raiz)
+    // 2. ABA 1: MONITOR PJ (1695 x 928)
     // =========================================================================
     const CANVAS_W = 1695;
     const CANVAS_H = 928;
@@ -2305,8 +2337,8 @@
         mState.conta = bracketMatch[2].trim();
         mState.cpfcnpj = formatarCNPJ(bracketMatch[3].trim());
         mState.nome = bracketMatch[4].trim().toUpperCase();
-        (bracketMatch[5] || '').split('|').map(p => p.trim()).filter(Boolean).forEach(part => {
-          const kv = part.match(/^([^:]+):\s*(.+)$/);
+        (bracketMatch[5] || '').replace(/^\s*-\s*/, '').split('|').map(p => p.trim()).filter(Boolean).forEach(part => {
+          const kv = part.match(/^([^:•-]+)\s*[:•-]\s*(.+)$/);
           if (!kv) return;
           const key = kv[1].trim().toLowerCase(), val = kv[2].trim();
           if (/^usu[aá]rios?$/.test(key)) {
@@ -2318,8 +2350,15 @@
           else if (/^e-?mail\s*gov$/.test(key) && isValidEmailValue(val)) { mState.email = val; temEmailGovValido = true; }
           else if (/^e-?mail$/.test(key) && !temEmailGovValido && isValidEmailValue(val)) mState.email = val;
         });
-      } else if (lines.some(l => (l.match(/\|/g) || []).length >= 6 && !/^\s*\[/.test(l))) {
-        const dataLine = lines.find(l => (l.match(/\|/g) || []).length >= 6 && !/^ag[eê]ncia/i.test(l));
+        if (!temEmailGovValido) {
+          const fallbackGovMail = text.match(/E-?mail\s*GOV\s*[:•-]\s*([^\s|]+@[^\s|]+)/i);
+          if (fallbackGovMail && isValidEmailValue(fallbackGovMail[1])) {
+            mState.email = fallbackGovMail[1].trim();
+            temEmailGovValido = true;
+          }
+        }
+      } else if (lines.some(l => (l.match(/\|/g) || []).length >= 6 && !/^\s*\[/.test(l) && !/^CPF\s*:/i.test(l))) {
+        const dataLine = lines.find(l => (l.match(/\|/g) || []).length >= 6 && !/^ag[eê]ncia/i.test(l) && !/^CPF\s*:/i.test(l));
         if (dataLine) {
           const cols = dataLine.split('|').map(c => c.trim());
           if (cols[0]) mState.ag = cols[0];
@@ -2330,28 +2369,52 @@
           if (isValidUsuarioValue(cols[7])) mState.usuario = cols[7].toUpperCase();
         }
       } else {
-        const emp = text.match(/(?:Empresa|Raz[aã]o\s*Social)[:\s]+([^\n]+)/i);
-        if (emp) mState.nome = emp[1].trim().toUpperCase();
-        const cnpj = text.match(/CNPJ[:\s]+([\d./-]+)/i);
+        const emp = text.match(/(?:Empresa|Raz[aã\uFFFD\s]?o\s*Social)[:\s•-]+([^\n]+(?:\n(?!(?:CNPJ|CPF|NOME|RENDA|DATA|Capital|Situa|E-?mail|Socios|Ag[\s\S]{0,3}ncia|Usu[\s\S]{0,3}rio|Telefone)[:\s•-])[^\n]+)*)/i);
+        if (emp) mState.nome = emp[1].replace(/\s+/g, ' ').trim().toUpperCase();
+        const cnpj = text.match(/CNPJ[:\s•-]+([\d./-]+)/i);
         if (cnpj) mState.cpfcnpj = formatarCNPJ(cnpj[1]);
-        const agConta = text.match(/Ag[eê]ncia\s*\/\s*Conta\s*:\s*([^\n|]+)\|\s*([^\n]+)/i);
+        const agConta = text.match(/Ag[^\n:/]{1,5}ncia\s*\/\s*Conta\s*:\s*([^\n|]+)\|\s*([^\n]+)/i);
         if (agConta) { mState.ag = agConta[1].trim(); mState.conta = agConta[2].trim(); }
         else {
-          const agM = text.match(/Ag[eê]ncia[:\s]+([^\n/]+)/i);
+          const agM = text.match(/Ag[^\n:/]{1,5}ncia[:\s•-]+([^\n/]+)/i);
           if (agM) mState.ag = agM[1].trim();
-          const ctM = text.match(/Conta[:\s]+([^\n]+)/i);
+          const ctM = text.match(/Conta[:\s•-]+([^\n]+)/i);
           if (ctM) mState.conta = ctM[1].trim();
         }
-        const usrM = text.match(/Usu[aá]rios?[:\s]+([^\n]+)/i);
+        const usrM = text.match(/^[ \t]*Usu[^\n:/]{0,4}rios?[ \t]*[:•-][ \t]*([^\r\n]+)/im);
         if (usrM && isValidUsuarioValue(usrM[1])) {
           const lista = usrM[1].split(/[,;]+/).map(u => u.trim()).filter(isValidUsuarioValue);
           if (lista.length >= 2) { renderMultiUsuarioSelector(lista); mState.usuario = lista[0].toUpperCase(); }
           else if (lista.length === 1) mState.usuario = lista[0].toUpperCase();
         }
-        const telM = text.match(/(?:Telefone\s*GOV|Telefone|Celular)[:\s]+([^\n]+)/i);
-        if (telM && telM[1].trim().toLowerCase() !== 'none') mState.celular = formatarTelefone(telM[1].trim());
-        const mailM = text.match(/E-?mail(?:\s*GOV)?[:\s]+([^\n]+)/i);
-        if (mailM && isValidEmailValue(mailM[1])) { mState.email = mailM[1].trim(); temEmailGovValido = true; }
+        const telGovM = text.match(/^[ \t]*Telefone[ \t]*GOV[ \t]*(?:[:•-][ \t]*|[ \t]+)([^\r\n]+)/im);
+        const telApiM = text.match(/^[ \t]*Telefone[ \t]*API[ \t]*(?:[:•-][ \t]*|[ \t]+)([^\r\n]+)/im);
+        const telOutrosM = text.match(/^[ \t]*(?:Telefone|Celular)[ \t]*(?:[:•-][ \t]*|[ \t]+)([^\r\n]+)/im);
+        const rawTelGov = telGovM ? telGovM[1].trim() : '';
+        const rawTelApi = telApiM ? telApiM[1].trim() : '';
+        const rawTelOutros = telOutrosM ? telOutrosM[1].trim() : '';
+
+        const chosenTel = [rawTelGov, rawTelApi, rawTelOutros].find(t => {
+          if (!t || ['none', 'null', 'nan', '-', '--'].includes(t.toLowerCase())) return false;
+          return apenasNumeros(t).length >= 8;
+        });
+        if (chosenTel) mState.celular = formatarTelefone(chosenTel);
+
+        const mailGovM = text.match(/^[ \t]*E-?mail[ \t]*GOV[ \t]*(?:[:•-][ \t]*|[ \t]+)([^\s\r\n]+(?:[ \t]*\n[ \t]*@[^\s\r\n]+|@[^\s\r\n]+))/im);
+        if (mailGovM) {
+          const joinedMail = mailGovM[1].replace(/\s+/g, '').trim();
+          if (isValidEmailValue(joinedMail)) {
+            mState.email = joinedMail;
+            temEmailGovValido = true;
+          }
+        }
+        if (!temEmailGovValido) {
+          const mailM = text.match(/^[ \t]*E-?mail[ \t]*[:•-][ \t]*([^\s\r\n]+(?:[ \t]*\n[ \t]*@[^\s\r\n]+|@[^\s\r\n]+))/im);
+          if (mailM) {
+            const joinedMail = mailM[1].replace(/\s+/g, '').trim();
+            if (isValidEmailValue(joinedMail)) mState.email = joinedMail;
+          }
+        }
       }
 
       saveMonitorState();
@@ -2442,6 +2505,90 @@
     // =========================================================================
     // 3. ABA 2: ATUALIZAÇÃO CADASTRAL (assets/logos/ + jsPDF)
     // =========================================================================
+    let docUsuariosLista = { cadastral: [], certificado: [] };
+
+    function extrairListaUsuariosFicha(textoFicha) {
+      const encontrados = [];
+      const addUsers = rawStr => {
+        String(rawStr || '')
+          .split(/[,;/|\s]+/)
+          .map(u => u.trim().toUpperCase())
+          .filter(u => isValidUsuarioValue(u) && u !== 'MASTER' && /^[A-Z]{2,}[A-Z0-9]*\d+$/.test(u))
+          .forEach(u => {
+            if (!encontrados.includes(u)) encontrados.push(u);
+          });
+      };
+
+      const matches = textoFicha.matchAll(/^[ \t]*Usu[^\n:/]{0,4}rios?[ \t]*[:•-][ \t]*([^\r\n]+)/gim);
+      for (const m of matches) addUsers(m[1]);
+
+      if (!encontrados.length) {
+        const inlineMatch = textoFicha.match(/Usu[^\n:/]{0,4}rios?[ \t]*[:•-][ \t]*([A-Za-z0-9,\s;/]+)/i);
+        if (inlineMatch) addUsers(inlineMatch[1]);
+      }
+      return encontrados;
+    }
+
+    function renderMultiUsuarioDocSelector(tipo, lista) {
+      const prefix = tipo === 'certificado' ? 'cert' : 'cad';
+      const box = document.getElementById(`${prefix}MultiUsuarioBox`);
+      const listEl = document.getElementById(`${prefix}MultiUsuarioList`);
+      const countEl = document.getElementById(`${prefix}MultiUsuarioCount`);
+      const inputEl = document.getElementById(`${prefix}Usuario`);
+      if (!box || !listEl || !countEl || !inputEl) return;
+
+      if (!Array.isArray(lista) || lista.length < 2) {
+        docUsuariosLista[tipo] = [];
+        box.classList.add('hidden');
+        box.classList.remove('flex');
+        listEl.innerHTML = '';
+        return;
+      }
+
+      docUsuariosLista[tipo] = lista.map(u => String(u).trim().toUpperCase()).filter(Boolean);
+      countEl.textContent = docUsuariosLista[tipo].length;
+      listEl.innerHTML = '';
+
+      const selectedList = String(inputEl.value || '')
+        .split(',')
+        .map(s => s.trim().toUpperCase())
+        .filter(Boolean);
+
+      docUsuariosLista[tipo].forEach(usr => {
+        const active = selectedList.includes(usr);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = usr;
+        btn.className = active
+          ? 'px-2 py-1 rounded text-[11px] font-bold bg-[#c8105a] text-white cursor-pointer'
+          : 'px-2 py-1 rounded text-[11px] font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 cursor-pointer';
+        btn.onclick = () => selecionarUsuarioDoc(tipo, usr);
+        listEl.appendChild(btn);
+      });
+
+      box.classList.remove('hidden');
+      box.classList.add('flex');
+    }
+
+    function selecionarUsuarioDoc(tipo, usr) {
+      const prefix = tipo === 'certificado' ? 'cert' : 'cad';
+      const inputEl = document.getElementById(`${prefix}Usuario`);
+      if (inputEl) inputEl.value = usr ? String(usr).trim().toUpperCase() : '';
+      if (tipo === 'certificado') renderCertificadoPreview();
+      else renderCadastralPreview();
+      renderMultiUsuarioDocSelector(tipo, docUsuariosLista[tipo]);
+    }
+
+    function selecionarTodosUsuariosDoc(tipo) {
+      const prefix = tipo === 'certificado' ? 'cert' : 'cad';
+      const inputEl = document.getElementById(`${prefix}Usuario`);
+      if (!docUsuariosLista[tipo] || !docUsuariosLista[tipo].length || !inputEl) return;
+      inputEl.value = docUsuariosLista[tipo].join(', ');
+      if (tipo === 'certificado') renderCertificadoPreview();
+      else renderCadastralPreview();
+      renderMultiUsuarioDocSelector(tipo, docUsuariosLista[tipo]);
+    }
+
     function toggleCadModo(modo) {
       const box = document.getElementById('cadAutoBox');
       if (box) box.style.display = modo === 'auto' ? 'flex' : 'none';
@@ -2471,10 +2618,10 @@
           }
         });
       } else {
-        const mEmp = textoFicha.match(/Empresa[:\s]+([^\n]+)/i);
-        if (mEmp) dados.razao = mEmp[1].trim();
+        const mEmp = textoFicha.match(/Empresa[:\s]+([^\n]+(?:\n(?!(?:CNPJ|CPF|NOME|RENDA|DATA|Capital|Situa|E-?mail|Socios|Ag[\s\S]{0,3}ncia|Usu[\s\S]{0,3}rio|Telefone)[:\s•-])[^\n]+)*)/i);
+        if (mEmp) dados.razao = mEmp[1].replace(/\s+/g, ' ').trim();
         else {
-          const mRazao = textoFicha.match(/RAZ[ÃA]O SOCIAL[:\s]+([^\n]+)/i);
+          const mRazao = textoFicha.match(/RAZ[^\n:/]{1,4}O SOCIAL[:\s]+([^\n]+)/i);
           if (mRazao) dados.razao = mRazao[1].trim();
           else {
             const mBracket = textoFicha.match(/\[\d+\|\d+-[0-9X]\]\s*-\s*\[\d+\]\s*-\s*\[([^\]]+)\]/);
@@ -2490,15 +2637,20 @@
           if (mCnpj2) dados.cnpj = formatarCNPJ(mCnpj2[1]);
         }
 
-        const mCpf = textoFicha.match(/CPF(?:\s*USU[ÁA]RIO\s*MASTER)?[:\s]*([\d.-]{11,14})/i);
+        const mCpf = textoFicha.match(/CPF(?:\s*USU[^\n:/]{1,4}RIO\s*MASTER)?[:\s]*([\d.-]{11,14})/i);
         if (mCpf && apenasNumeros(mCpf[1]).length === 11) {
           dados.cpfMaster = formatarCPF(mCpf[1]);
         }
 
-        const mUser = textoFicha.match(/Usu[áa]rios?[:\s]+([A-Za-z0-9]+)/i);
+        const mUser = textoFicha.match(/^\s*Usu[^\n:/]{0,4}rios?[:\s]+([A-Za-z0-9]+)/im);
         if (mUser && mUser[1].toUpperCase() !== 'MASTER' && isValidUsuarioValue(mUser[1])) {
           dados.usuario = mUser[1].trim();
         }
+      }
+
+      const listaUsers = extrairListaUsuariosFicha(textoFicha);
+      if (listaUsers.length > 0 && !dados.usuario) {
+        dados.usuario = listaUsers[0];
       }
 
       return dados;
@@ -2512,12 +2664,14 @@
       }
 
       const dados = extrairDadosFichaComum(textoFicha);
+      const listaUsers = extrairListaUsuariosFicha(textoFicha);
       document.getElementById('cadRazao').value = dados.razao;
       document.getElementById('cadCnpj').value = dados.cnpj;
       document.getElementById('cadSituacao').value = dados.situacao;
       document.getElementById('cadCpfMaster').value = dados.cpfMaster;
       document.getElementById('cadUsuario').value = dados.usuario;
 
+      renderMultiUsuarioDocSelector('cadastral', listaUsers);
       renderCadastralPreview();
       showToast('Ficha lida e dados extraídos com sucesso!');
     }
@@ -2567,6 +2721,7 @@
       document.getElementById('cadSituacao').value = 'ATIVA';
       document.getElementById('cadCpfMaster').value = '';
       document.getElementById('cadUsuario').value = '';
+      renderMultiUsuarioDocSelector('cadastral', []);
       renderCadastralPreview();
       showToast('Campos limpos!');
     }
@@ -2808,11 +2963,13 @@
         return;
       }
       const dados = extrairDadosFichaComum(textoFicha);
+      const listaUsers = extrairListaUsuariosFicha(textoFicha);
       document.getElementById('certRazao').value = dados.razao;
       document.getElementById('certCnpj').value = dados.cnpj;
       document.getElementById('certSituacao').value = dados.situacao;
       document.getElementById('certCpfMaster').value = dados.cpfMaster;
       document.getElementById('certUsuario').value = dados.usuario;
+      renderMultiUsuarioDocSelector('certificado', listaUsers);
       renderCertificadoPreview();
       showToast('Ficha lida para Certificado Digital!');
     }
@@ -2852,6 +3009,10 @@
       if (userRow) userRow.style.display = hasValidUser ? '' : 'none';
       document.getElementById('pvCertUser').textContent = hasValidUser ? userVal : '';
 
+      if (docUsuariosLista.certificado.length >= 2) {
+        renderMultiUsuarioDocSelector('certificado', docUsuariosLista.certificado);
+      }
+
       buildCadWatermark('certWatermarkLayer');
     }
 
@@ -2862,6 +3023,7 @@
       document.getElementById('certSituacao').value = 'ATIVA';
       document.getElementById('certCpfMaster').value = '';
       document.getElementById('certUsuario').value = '';
+      renderMultiUsuarioDocSelector('certificado', []);
       renderCertificadoPreview();
       showToast('Campos limpos!');
     }
