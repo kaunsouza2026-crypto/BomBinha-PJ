@@ -14,80 +14,88 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #f4f5f7;
-      color: #1e293b;
+      background: linear-gradient(180deg, #eef2f6 0%, #f5f7fa 100%);
+      color: #0f172a;
       margin: 0;
+      -webkit-font-smoothing: antialiased;
     }
 
     /* Barra superior de abas arredondadas */
     .top-tabs-bar {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+      border: 1px solid #dbe2ea;
+      border-radius: 18px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
     }
 
     .nav-tab-btn {
-      color: #475569;
-      background: transparent;
+      color: #334155;
+      background: #f8fafc;
+      border: 1px solid transparent;
       border-radius: 12px;
       transition: all 0.18s ease;
     }
 
     .nav-tab-btn:hover:not(.active) {
-      background: #f8fafc;
+      background: #f1f5f9;
+      border-color: #cbd5e1;
       color: #0f172a;
     }
 
     .nav-tab-btn.active {
       background: linear-gradient(135deg, #c8105a 0%, #9e0b46 100%);
       color: #ffffff;
-      box-shadow: 0 4px 12px rgba(200, 16, 90, 0.28);
+      border-color: #9e0b46;
+      box-shadow: 0 6px 16px rgba(200, 16, 90, 0.28);
     }
 
     /* Cards brancos das colunas */
     .panel-card {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+      border: 1px solid #dbe2ea;
+      border-radius: 18px;
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
     }
 
     /* Terminal escuro interno (Monitor PJ) */
     .terminal-form-box {
-      background-color: #060b13;
-      color: #9dc5eb;
+      background-color: #050a12;
+      color: #bae6fd;
       font-family: "Courier New", "Lucida Console", monospace;
-      border-radius: 12px;
+      border-radius: 14px;
       border: 1px solid #1e293b;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
     }
 
     .term-input {
-      background: transparent;
+      background: rgba(15, 23, 42, 0.45);
       border: none;
-      border-bottom: 1px solid #1e3a5f;
-      color: #e2e8f0;
+      border-bottom: 1.5px solid #234168;
+      border-radius: 4px 4px 0 0;
+      color: #f8fafc;
       font-family: "Courier New", "Lucida Console", monospace;
-      font-size: 12.5px;
-      padding: 2px 4px;
+      font-size: 13px;
+      padding: 4px 6px;
       outline: none;
       width: 100%;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
     }
 
     .term-input:focus {
       border-bottom-color: #38bdf8;
-      background: rgba(56, 189, 248, 0.07);
+      background: rgba(56, 189, 248, 0.12);
     }
 
     .term-select {
-      background-color: #060b13;
+      background-color: #08111e;
       border: none;
-      border-bottom: 1px solid #1e3a5f;
-      color: #f43f5e;
+      border-bottom: 1.5px solid #234168;
+      border-radius: 4px 4px 0 0;
+      color: #fb7185;
       font-family: "Courier New", "Lucida Console", monospace;
-      font-size: 12.5px;
+      font-size: 13px;
       font-weight: 700;
-      padding: 2px 4px;
+      padding: 4px 6px;
       outline: none;
       cursor: pointer;
     }
@@ -98,16 +106,17 @@
 
     /* Visualizador escuro à direita */
     .viewer-dark-shell {
-      background-color: #2b2d30;
-      border-radius: 12px;
+      background-color: #23262b;
+      border-radius: 14px;
       overflow: hidden;
-      border: 1px solid #1f2023;
+      border: 1px solid #181a1f;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
     }
 
     .viewer-topbar {
-      background-color: #1f2023;
-      color: #e5e7eb;
-      border-bottom: 1px solid #37393e;
+      background-color: #181a1f;
+      color: #f1f5f9;
+      border-bottom: 1px solid #2e323b;
     }
 
     /* Folha A4 visual em tela */
@@ -119,7 +128,8 @@
       min-height: 920px;
       margin: 0 auto;
       padding: 40px 42px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+      border-radius: 4px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.48);
       position: relative;
       font-family: Helvetica, Arial, sans-serif;
       font-size: 12px;
@@ -233,6 +243,84 @@
       opacity: 1;
       transform: translateY(0);
     }
+
+    /* Tema Escuro (UI) */
+    body.dark-theme {
+      background: linear-gradient(180deg, #0b111d 0%, #111827 100%);
+      color: #f1f5f9;
+    }
+
+    body.dark-theme .top-tabs-bar,
+    body.dark-theme .panel-card {
+      background: #161f30;
+      border-color: #273449;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    body.dark-theme .nav-tab-btn {
+      color: #cbd5e1;
+      background: #1e293b;
+    }
+
+    body.dark-theme .nav-tab-btn:hover:not(.active) {
+      background: #283548;
+      border-color: #3b4c66;
+      color: #ffffff;
+    }
+
+    body.dark-theme .panel-card h1,
+    body.dark-theme .panel-card h2,
+    body.dark-theme .panel-card h3 {
+      color: #f8fafc;
+    }
+
+    body.dark-theme .panel-card p,
+    body.dark-theme .panel-card label,
+    body.dark-theme .panel-card span.text-slate-600,
+    body.dark-theme .panel-card span.text-slate-700,
+    body.dark-theme .panel-card span.text-slate-800 {
+      color: #cbd5e1;
+    }
+
+    body.dark-theme .panel-card .bg-slate-50 {
+      background-color: #101726;
+      border-color: #273449;
+    }
+
+    body.dark-theme .panel-card input[type="text"],
+    body.dark-theme .panel-card select,
+    body.dark-theme .panel-card textarea {
+      background-color: #0b1220;
+      border-color: #334155;
+      color: #f8fafc;
+    }
+
+    body.dark-theme .panel-card button.bg-white {
+      background-color: #1e293b;
+      border-color: #334155;
+      color: #e2e8f0;
+    }
+
+    body.dark-theme .panel-card button.bg-white:hover {
+      background-color: #283548;
+    }
+
+    body.dark-theme #cnpjResultadoContainer {
+      background-color: #101726;
+      border-color: #273449;
+      color: #cbd5e1;
+    }
+
+    body.dark-theme #cnpjResultadoContainer .bg-white {
+      background-color: #161f30;
+      border-color: #273449;
+      color: #f1f5f9;
+    }
+
+    body.dark-theme #cnpjResultadoContainer h3,
+    body.dark-theme #cnpjResultadoContainer strong {
+      color: #f8fafc;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -241,9 +329,9 @@
   <div class="w-full h-1.5 bg-gradient-to-r from-[#c8105a] to-[#9e0b46]"></div>
 
   <div class="max-w-[1440px] w-full mx-auto px-3 sm:px-6 py-4 flex flex-col gap-4">
-    <!-- BARRA SUPERIOR DE 6 ABAS -->
-    <header class="top-tabs-bar p-2">
-      <nav class="flex flex-wrap items-center justify-center gap-1.5 w-full" role="tablist">
+    <!-- BARRA SUPERIOR DE 6 ABAS + TEMA CLARO / ESCURO -->
+    <header class="top-tabs-bar p-2 flex flex-col xl:flex-row items-center justify-between gap-2">
+      <nav class="flex flex-wrap items-center justify-center gap-1.5 w-full xl:flex-1" role="tablist">
         <button type="button" id="tabBtn-monitor" onclick="switchMainTab('monitor')" class="nav-tab-btn active flex-1 min-w-[130px] py-3 px-2.5 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
           <span>🖥️ Monitor PJ</span>
         </button>
@@ -263,6 +351,10 @@
           <span>🔍 Consulta CNPJ</span>
         </button>
       </nav>
+      <button type="button" id="btnThemeToggle" onclick="toggleThemeMode()" class="nav-tab-btn shrink-0 py-2.5 px-3.5 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200" title="Alternar entre tema claro e escuro">
+        <span id="themeToggleIcon">🌙</span>
+        <span id="themeToggleLabel">Escuro</span>
+      </button>
     </header>
 
     <!-- =======================================================================
@@ -622,6 +714,10 @@
             <label class="block text-xs font-semibold text-slate-700 mb-1">Usuário(s)</label>
             <input type="text" id="cadUsuario" value="PAPDB00001" oninput="renderCadastralPreview()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
           </div>
+
+          <button type="button" onclick="limparCadastral()" class="mt-1 w-full py-2 px-3 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 cursor-pointer">
+            Limpar campos
+          </button>
         </div>
       </section>
 
@@ -836,6 +932,10 @@
             <label class="block text-xs font-semibold text-slate-700 mb-1">Usuário(s) (opcional — vazio remove do PDF)</label>
             <input type="text" id="certUsuario" value="IAPF00025" oninput="renderCertificadoPreview()" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#c8105a]" />
           </div>
+
+          <button type="button" onclick="limparCertificado()" class="mt-1 w-full py-2 px-3 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 cursor-pointer">
+            Limpar campos
+          </button>
         </div>
       </section>
 
@@ -1092,6 +1192,10 @@
             <input type="text" id="agDataDebito" oninput="renderAgendamentoPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs" />
           </div>
         </div>
+
+        <button type="button" onclick="limparAgendamento()" class="w-full py-2 px-3 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 cursor-pointer">
+          Limpar campos
+        </button>
       </section>
 
       <!-- COLUNA DIREITA: PREVIEW + DOWNLOAD PDF VIA JSPDF -->
@@ -1282,6 +1386,10 @@
             <textarea id="bouDespacho" rows="2" oninput="renderBoletimPreview()" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900">Considerando a natureza da ocorrência, encaminhe-se este registro para o Departamento de Investigação de Crimes Cibernéticos para as devidas apurações e providências legais cabíveis.</textarea>
           </div>
         </div>
+
+        <button type="button" onclick="limparBoletim()" class="w-full py-2 px-3 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 cursor-pointer">
+          Limpar campos
+        </button>
       </section>
 
       <!-- COLUNA DIREITA: PREVIEW 2 PÁGINAS + DOWNLOAD PDF -->
@@ -1467,6 +1575,24 @@
 
     window.isValidUsuarioValue = isValidUsuarioValue;
     window.isValidEmailValue = isValidEmailValue;
+
+    const THEME_STORAGE_KEY = 'central_unificada_theme_mode_v1';
+
+    function applyThemeMode(mode) {
+      const isDark = mode === 'dark';
+      document.body.classList.toggle('dark-theme', isDark);
+      const iconEl = document.getElementById('themeToggleIcon');
+      const labelEl = document.getElementById('themeToggleLabel');
+      if (iconEl) iconEl.textContent = isDark ? '☀️' : '🌙';
+      if (labelEl) labelEl.textContent = isDark ? 'Claro' : 'Escuro';
+    }
+
+    function toggleThemeMode() {
+      const nextMode = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
+      try { localStorage.setItem(THEME_STORAGE_KEY, nextMode); } catch (e) {}
+      applyThemeMode(nextMode);
+      showToast(nextMode === 'dark' ? 'Tema escuro ativado!' : 'Tema claro ativado!');
+    }
 
     const ASSET_BASE = window.location.pathname.includes('/seu-repositorio/') ? './' : 'seu-repositorio/';
     const STATIC_IMG_MAP = {
@@ -4029,6 +4155,10 @@
     window.addEventListener('resize', updateCalibrationUI);
 
     window.addEventListener('load', async () => {
+      try {
+        const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+        if (savedTheme === 'dark' || savedTheme === 'light') applyThemeMode(savedTheme);
+      } catch (e) {}
       applyStaticAssetPaths();
       const now = new Date();
       const pad = n => String(n).padStart(2, '0');
