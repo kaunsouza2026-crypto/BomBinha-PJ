@@ -1,0 +1,5 @@
+Estrutura inicial do projeto.
+
+Os arquivos PNG incluídos são apenas imagens provisórias para manter a estrutura das pastas. Substitua-os pelos logotipos, imagens e QR code reais.
+As pastas de estados incluem as 27 UFs brasileiras (incluindo DF).
+A pasta logo_banco contém nomes de bancos comuns; acrescente ou remova arquivos conforme os bancos utilizados no seu projeto.

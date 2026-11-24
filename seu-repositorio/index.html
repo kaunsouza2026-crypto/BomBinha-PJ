@@ -1,0 +1,2597 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal Mainframe Sistema Interno</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at top right, #122033 0%, #0b1017 55%, #080c12 100%);
+      color: #e2e8f0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (min-width: 1024px) {
+      body {
+        flex-direction: row;
+        overflow: hidden;
+      }
+    }
+
+    /* Scrollbar discreta */
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(11, 16, 22, 0.7);
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #253649;
+      border-radius: 999px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #364f6b;
+    }
+
+    /* =====================================================================
+       COLUNA ESQUERDA: FORMULÁRIO FIXO (340px)
+       ===================================================================== */
+    .sidebar {
+      width: 100%;
+      background: linear-gradient(180deg, #131d29 0%, #0f1620 100%);
+      border-bottom: 1px solid #223244;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 20;
+      box-shadow: 6px 0 28px rgba(0, 0, 0, 0.35);
+    }
+
+    @media (min-width: 1024px) {
+      .sidebar {
+        width: 344px;
+        height: 100%;
+        border-bottom: none;
+        border-right: 1px solid #223244;
+      }
+    }
+
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px 14px 24px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .section-block {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #8ba3bc;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(139, 163, 188, 0.22), transparent);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 500;
+      color: #9fb2c6;
+      margin-bottom: 4px;
+    }
+
+    .link-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #38bdf8;
+      font-size: 10.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+
+    .link-btn:hover {
+      color: #7dd3fc;
+      text-decoration: underline;
+    }
+
+    .form-input {
+      width: 100%;
+      background-color: #0b1118;
+      border: 1px solid #223244;
+      border-radius: 7px;
+      padding: 7.5px 10px;
+      font-size: 12.5px;
+      font-family: inherit;
+      color: #f8fafc;
+      transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+    }
+
+    .form-input:hover {
+      border-color: #2f455d;
+    }
+
+    .form-input:focus {
+      outline: none;
+      background-color: #0d151e;
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16);
+    }
+
+    .form-input::placeholder {
+      color: #52657a;
+    }
+
+    .resp-card {
+      background: linear-gradient(180deg, rgba(19, 29, 41, 0.72) 0%, rgba(13, 20, 29, 0.88) 100%);
+      border: 1px solid #223244;
+      border-radius: 9px;
+      padding: 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+
+    .resp-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+
+    /* Abas da Barra Lateral */
+    .sidebar-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background-color: #090e14;
+      border-bottom: 1px solid #223244;
+      padding: 7px 10px;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-tab-btn {
+      background-color: transparent;
+      border: 1px solid transparent;
+      color: #8ba3bc;
+      font-size: 11.5px;
+      font-weight: 700;
+      font-family: inherit;
+      padding: 7.5px 8px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .sidebar-tab-btn:hover {
+      color: #f1f5f9;
+      background-color: rgba(30, 44, 60, 0.55);
+    }
+
+    .sidebar-tab-btn.active {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.18) 0%, rgba(43, 130, 217, 0.22) 100%);
+      border-color: rgba(56, 189, 248, 0.55);
+      color: #7dd3fc;
+      box-shadow: 0 2px 10px rgba(14, 165, 233, 0.16);
+    }
+
+    .cnpj-info-card {
+      background-color: #0e1620;
+      border: 1px solid #223244;
+      border-radius: 9px;
+      padding: 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 11.5px;
+    }
+
+    .cnpj-info-row {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border-bottom: 1px solid rgba(34, 50, 68, 0.75);
+      padding-bottom: 6px;
+    }
+
+    .cnpj-info-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .cnpj-info-lbl {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #6f859c;
+      font-weight: 700;
+    }
+
+    .cnpj-info-val {
+      color: #f8fafc;
+      word-break: break-word;
+      line-height: 1.4;
+    }
+
+    .btn {
+      border: 1px solid #24364a;
+      background: linear-gradient(180deg, #192432 0%, #131c27 100%);
+      color: #e2e8f0;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      padding: 8px 13px;
+      border-radius: 7px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    }
+
+    .btn:hover:not(:disabled) {
+      background: linear-gradient(180deg, #213042 0%, #182330 100%);
+      border-color: #38516e;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2b82d9 0%, #1d64b8 100%);
+      border-color: #3b93ec;
+      color: #ffffff;
+      font-weight: 700;
+      padding: 9px 16px;
+      font-size: 12px;
+      letter-spacing: 0.02em;
+      box-shadow: 0 4px 14px rgba(43, 130, 217, 0.35);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #3892ec 0%, #2573ce 100%);
+      border-color: #60a5fa;
+      box-shadow: 0 6px 18px rgba(43, 130, 217, 0.45);
+    }
+
+    .btn-danger {
+      background: rgba(153, 27, 27, 0.28);
+      border-color: rgba(248, 113, 113, 0.35);
+      color: #fda4af;
+      font-size: 11px;
+      padding: 3.5px 9px;
+      box-shadow: none;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: rgba(185, 28, 28, 0.5);
+      border-color: rgba(252, 165, 165, 0.55);
+      color: #ffffff;
+    }
+
+    /* =====================================================================
+       COLUNA DIREITA: ÁREA DE PRÉ-VISUALIZAÇÃO (1695 x 928 px)
+       ===================================================================== */
+    .main-area {
+      flex: 1;
+      background: radial-gradient(circle at 50% 15%, rgba(30, 58, 95, 0.22) 0%, rgba(11, 16, 23, 0) 65%);
+      overflow-y: auto;
+      padding: 18px 22px 28px 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .preview-wrapper {
+      width: 100%;
+      max-width: 1220px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .monitor-box {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1695 / 928;
+      background-color: #0e151e;
+      border: 1px solid #26384c;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.72), 0 0 0 1px rgba(255, 255, 255, 0.04);
+      line-height: 0;
+    }
+
+    #outputCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .empty-photo-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(19, 27, 36, 0.94) 0%, rgba(11, 16, 22, 0.98) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      line-height: 1.5;
+      z-index: 15;
+    }
+
+    .empty-photo-card {
+      max-width: 480px;
+      background-color: #131d29;
+      border: 1px dashed #38bdf8;
+      border-radius: 14px;
+      padding: 26px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+    }
+
+    .empty-photo-card h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #f8fafc;
+    }
+
+    .empty-photo-card p {
+      margin: 0;
+      font-size: 12.5px;
+      color: #94a3b8;
+    }
+
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(180deg, #141e2b 0%, #101721 100%);
+      border: 1px solid #223244;
+      border-radius: 9px;
+      padding: 8px 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    }
+
+    .page-indicator {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #cbd5e1;
+      letter-spacing: 0.01em;
+    }
+
+    .actions-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: rgba(19, 29, 41, 0.55);
+      border: 1px solid rgba(34, 50, 68, 0.8);
+      border-radius: 10px;
+      padding: 9px 11px;
+    }
+
+    .actions-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .caption-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11.5px;
+      color: #7f95ac;
+      padding: 0 2px;
+    }
+
+    #calibrationOverlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: none;
+      z-index: 25;
+    }
+
+    #calibrationOverlay.active {
+      display: block;
+      pointer-events: auto;
+    }
+
+    .corner-handle {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      margin-left: -11px;
+      margin-top: -11px;
+      border-radius: 50%;
+      background: rgba(245, 158, 11, 0.94);
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.85);
+      cursor: grab;
+      z-index: 30;
+      touch-action: none;
+    }
+
+    .corner-handle:active {
+      cursor: grabbing;
+      transform: scale(1.15);
+    }
+
+    .corner-tag {
+      position: absolute;
+      top: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(13, 19, 26, 0.94);
+      color: #fbbf24;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 4px;
+      white-space: nowrap;
+      pointer-events: none;
+      line-height: 1.2;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #162231 0%, #101824 100%);
+      border: 1px solid #38bdf8;
+      color: #f8fafc;
+      padding: 10px 16px;
+      border-radius: 9px;
+      font-size: 12.5px;
+      font-weight: 500;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65);
+      z-index: 100;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =======================================================================
+       COLUNA ESQUERDA: FORMULÁRIO FIXO COM SCROLL INTERNO
+       ======================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-tabs">
+      <button type="button" id="tabBtnTerminal" class="sidebar-tab-btn active" onclick="switchSidebarTab('terminal')">
+        Tela Terminal
+      </button>
+      <button type="button" id="tabBtnCnpj" class="sidebar-tab-btn" onclick="switchSidebarTab('cnpj')">
+        Consulta CNPJ
+      </button>
+    </div>
+
+    <!-- ABA 1: FORMULÁRIO DO TERMINAL -->
+    <div id="tabPanelTerminal" class="sidebar-content custom-scroll">
+
+      <!-- IMPORTAR FICHA AUTOMÁTICA -->
+      <section class="section-block" style="background:#0f161e; border:1px solid #233140; border-radius:8px; padding:10px;">
+        <div class="field-label" style="margin-bottom:4px;">
+          <span style="font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:0.04em;">Colar Ficha (Auto-preencher)</span>
+          <button type="button" onclick="limparFichaInput()" class="link-btn">Limpar</button>
+        </div>
+        <textarea id="fichaInput" rows="4" class="form-input custom-scroll" style="resize:vertical; font-size:11.5px; line-height:1.35;" placeholder="Cole aqui o texto da ficha (Empresa, CNPJ, Agência/Conta, Usuários, Telefone GOV, E-mail GOV...)"></textarea>
+        <button type="button" onclick="preencherPorFicha()" class="btn btn-primary" style="width:100%; padding:7px 10px; font-size:11.5px;">
+          Preencher Campos Automaticamente
+        </button>
+
+        <!-- Seletor exibido automaticamente quando a ficha possui 2 ou mais usuários -->
+        <div id="multiUsuarioBox" style="display:none; margin-top:4px; padding-top:8px; border-top:1px dashed #233140;">
+          <div class="field-label" style="margin-bottom:5px;">
+            <span style="color:#fbbf24; font-weight:700;">Escolher Usuário (<span id="multiUsuarioCount">0</span>)</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button type="button" onclick="selecionarTodosUsuariosDaLista()" class="link-btn" style="color:#38bdf8; font-weight:600;">Todos</button>
+              <span style="color:#334155;">|</span>
+              <button type="button" onclick="selecionarUsuarioDaLista('')" class="link-btn" style="color:#94a3b8;">Deixar sem</button>
+            </div>
+          </div>
+          <div id="multiUsuarioList" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
+        </div>
+      </section>
+
+      <!-- CABEÇALHO -->
+      <section class="section-block">
+        <h2 class="section-title">CABEÇALHO</h2>
+        <div class="grid-2">
+          <div>
+            <label class="field-label"><span>Matrícula</span></label>
+            <input type="text" data-field="matricula" class="form-input" placeholder="749.152-2">
+          </div>
+          <div>
+            <label class="field-label">
+              <span>Data / hora</span>
+              <button type="button" onclick="setNowDateTime()" class="link-btn">Agora</button>
+            </label>
+            <input type="text" data-field="dataHora" class="form-input" placeholder="24/11/2026 11:10">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label class="field-label"><span>Agência</span></label>
+            <input type="text" data-field="ag" class="form-input" placeholder="0180">
+          </div>
+          <div>
+            <label class="field-label"><span>Produto</span></label>
+            <input type="text" data-field="produto" class="form-input" placeholder="237">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label class="field-label"><span>Página</span></label>
+            <input type="text" data-field="pag" class="form-input" placeholder="001">
+          </div>
+          <div>
+            <label class="field-label"><span>Conta</span></label>
+            <input type="text" data-field="conta" class="form-input" placeholder="481997-7">
+          </div>
+        </div>
+      </section>
+
+      <!-- EMPRESA -->
+      <section class="section-block">
+        <h2 class="section-title">EMPRESA</h2>
+        <div>
+          <label class="field-label"><span>Nome / Razão social</span></label>
+          <input type="text" data-field="nome" class="form-input" placeholder="UMUGRAOS COMERCIO LTDA">
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label class="field-label">
+              <span>CPF / CNPJ</span>
+              <button type="button" onclick="consultarCNPJOnline(state.cpfcnpj, true)" class="link-btn" title="Buscar endereço e dados pelo CNPJ">Buscar CNPJ</button>
+            </label>
+            <input type="text" data-field="cpfcnpj" class="form-input" placeholder="05.363.017/0001-27">
+          </div>
+          <div>
+            <label class="field-label"><span>Última atualização</span></label>
+            <input type="text" data-field="dataAtualizacao" class="form-input" placeholder="****">
+          </div>
+        </div>
+      </section>
+
+      <!-- ENDEREÇO -->
+      <section class="section-block">
+        <h2 class="section-title">ENDEREÇO</h2>
+        <div>
+          <label class="field-label"><span>Endereço</span></label>
+          <input type="text" data-field="endereco" class="form-input" placeholder="-">
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label class="field-label"><span>CEP</span></label>
+            <input type="text" data-field="cep" class="form-input" placeholder="-">
+          </div>
+          <div>
+            <label class="field-label"><span>Bairro</span></label>
+            <input type="text" data-field="bairro" class="form-input" placeholder="-">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label class="field-label"><span>UF</span></label>
+            <input type="text" data-field="uf" maxlength="4" class="form-input" placeholder="PR">
+          </div>
+          <div>
+            <label class="field-label"><span>Cidade</span></label>
+            <input type="text" data-field="cidade" class="form-input" placeholder="-">
+          </div>
+        </div>
+      </section>
+
+      <!-- CADASTRO -->
+      <section class="section-block">
+        <h2 class="section-title">CADASTRO</h2>
+        <div class="grid-2">
+          <div>
+            <label class="field-label"><span>Situação</span></label>
+            <select data-field="situacao" class="form-input">
+              <option value="">—</option>
+              <option value="ATIVA">ATIVA</option>
+              <option value="INATIVA">INATIVA</option>
+              <option value="SUSPENSA">SUSPENSA</option>
+              <option value="BAIXADA">BAIXADA</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label"><span>Situação cadastral</span></label>
+            <select data-field="situacaoCadastral" class="form-input">
+              <option value="">—</option>
+              <option value="PENDENTE">PENDENTE</option>
+              <option value="REGULAR">REGULAR</option>
+              <option value="EM ANÁLISE">EM ANÁLISE</option>
+              <option value="APROVADO">APROVADO</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label class="field-label"><span>Módulo TOPAZ</span></label>
+            <input type="text" data-field="moduloTopaz" class="form-input" placeholder="INATIVO">
+          </div>
+          <div>
+            <label class="field-label"><span>Usuário (opcional)</span></label>
+            <input type="text" data-field="usuario" class="form-input" placeholder="Deixe vazio para ocultar">
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTATO -->
+      <section class="section-block">
+        <h2 class="section-title">CONTATO</h2>
+        <div class="grid-2">
+          <div>
+            <label class="field-label"><span>Celular</span></label>
+            <input type="text" data-field="celular" class="form-input" placeholder="(44) 99976-2525">
+          </div>
+          <div>
+            <label class="field-label"><span>E-mail</span></label>
+            <input type="text" data-field="email" class="form-input" placeholder="va**@ho*">
+          </div>
+        </div>
+      </section>
+
+      <!-- SÓCIOS / RESPONSÁVEIS -->
+      <section class="section-block">
+        <h2 class="section-title">SÓCIOS / RESPONSÁVEIS</h2>
+        <div id="responsaveisContainer" style="display:flex; flex-direction:column; gap:9px;"></div>
+        <button type="button" onclick="addResponsavel()" class="btn" style="width:100%;">
+          + Adicionar responsável
+        </button>
+      </section>
+
+      <!-- RODAPÉ DO FORMULÁRIO -->
+      <section class="section-block" style="padding-top:2px;">
+        <div class="grid-2">
+          <button type="button" onclick="limparCampos()" class="btn">Limpar campos</button>
+          <button type="button" onclick="restaurarExemplo()" class="btn">Restaurar exemplo</button>
+        </div>
+
+        <p style="margin:2px 0 0 0; font-size:11px; color:#64748b; line-height:1.45;">
+          Os dados ficam neste navegador. Consulta de CNPJ via bases públicas quando solicitado.
+        </p>
+      </section>
+
+    </div>
+
+    <!-- ABA 2: CONSULTA COMPLETA DE CNPJ -->
+    <div id="tabPanelCnpj" class="sidebar-content custom-scroll" style="display:none;">
+      <section class="section-block" style="background:#0f161e; border:1px solid #233140; border-radius:8px; padding:10px;">
+        <div class="field-label" style="margin-bottom:4px;">
+          <span style="font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:0.04em;">Consultar Dados do CNPJ</span>
+          <button type="button" onclick="limparConsultaCnpjTab()" class="link-btn">Limpar</button>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <input type="text" id="cnpjTabInput" class="form-input" placeholder="00.000.000/0001-00" onkeydown="if(event.key==='Enter') executarConsultaCnpjAba()">
+          <button type="button" id="btnBuscarCnpjAba" onclick="executarConsultaCnpjAba()" class="btn btn-primary" style="padding:7px 12px; white-space:nowrap;">
+            Buscar
+          </button>
+        </div>
+        <span style="font-size:10.5px; color:#64748b; line-height:1.35;">
+          Exibe Razão Social, Fantasia, Situação, Endereço, Telefones, E-mail, CNAE, Capital Social e Sócios (QSA).
+        </span>
+      </section>
+
+      <div id="cnpjTabEmpty" style="text-align:center; padding:24px 12px; color:#64748b; font-size:12px; border:1px dashed #233140; border-radius:8px;">
+        Digite um CNPJ acima e clique em <strong>Buscar</strong> para puxar as informações cadastrais.
+      </div>
+
+      <div id="cnpjTabResult" style="display:none; flex-direction:column; gap:12px;">
+        <div id="cnpjTabDetails" class="cnpj-info-card"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- =======================================================================
+       COLUNA DIREITA: PRÉ-VISUALIZAÇÃO (1695 x 928 px), PAGINAÇÃO E EXPORTAÇÃO
+       ======================================================================= -->
+  <main class="main-area custom-scroll">
+    <div class="preview-wrapper">
+
+      <div class="monitor-box" id="monitorBox">
+        <canvas id="outputCanvas" width="1695" height="928"></canvas>
+
+        <div class="empty-photo-overlay" id="emptyPhotoOverlay">
+          <div class="empty-photo-card">
+            <div style="font-size: 32px; line-height: 1;">🖥️</div>
+            <h3>Selecione a Foto do Monitor (1695 × 928)</h3>
+            <p>
+              Escolha a foto do monitor vazio uma única vez. Ela ficará salva automaticamente neste navegador (ou você pode exportar o HTML já com a foto gravada dentro).
+            </p>
+            <button type="button" onclick="document.getElementById('bgFileInput').click()" class="btn btn-primary" style="margin-top:4px;">
+              Carregar Foto do Monitor
+            </button>
+          </div>
+        </div>
+
+        <div id="calibrationOverlay">
+          <svg width="100%" height="100%" style="position:absolute; inset:0; pointer-events:none;">
+            <polygon id="calibPoly" fill="rgba(245, 158, 11, 0.14)" stroke="#fbbf24" stroke-width="2" stroke-dasharray="6,4" />
+          </svg>
+          <div class="corner-handle" data-corner="0"><span class="corner-tag">Topo Esq</span></div>
+          <div class="corner-handle" data-corner="1"><span class="corner-tag">Topo Dir</span></div>
+          <div class="corner-handle" data-corner="2"><span class="corner-tag">Base Dir</span></div>
+          <div class="corner-handle" data-corner="3"><span class="corner-tag">Base Esq</span></div>
+        </div>
+      </div>
+
+      <div class="pagination-bar">
+        <button type="button" id="btnPrevPage" onclick="changePage(-1)" class="btn">
+          ← Anterior
+        </button>
+        <span class="page-indicator" id="pageIndicator">Visualização 1 de 1</span>
+        <button type="button" id="btnNextPage" onclick="changePage(1)" class="btn">
+          Próxima →
+        </button>
+      </div>
+
+      <div class="actions-row">
+        <div class="actions-group">
+          <button type="button" onclick="downloadPNG()" class="btn btn-primary">
+            BAIXAR IMAGEM PNG
+          </button>
+          <button type="button" id="btnCopyText" onclick="copyTerminalText()" class="btn">
+            Copiar tela (texto)
+          </button>
+        </div>
+
+        <div class="actions-group">
+          <button type="button" id="btnSelectHomem" onclick="selectMonitorSlot('homem')" class="btn" title="Alternar para foto do monitor com reflexo de homem">
+            👨 Homem
+          </button>
+          <button type="button" id="btnSelectMulher" onclick="selectMonitorSlot('mulher')" class="btn" title="Alternar para foto do monitor com reflexo de mulher">
+            👩 Mulher
+          </button>
+          <input type="file" id="bgFileInput" accept="image/*" style="display:none" onchange="handleBgUpload(event)">
+        </div>
+      </div>
+
+      <div class="caption-row">
+        <span id="dimensionsCaption">
+          1695 × 928 px · Campos extensos e responsáveis adicionais continuam nas próximas páginas.
+        </span>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button type="button" id="btnResetCorners" onclick="resetDefaultCorners()" class="link-btn" style="font-size:11.5px; display:none; color:#fbbf24;">
+            ↺ Restaurar posição padrão
+          </button>
+          <button type="button" id="btnCalibrate" onclick="toggleCalibration()" class="link-btn" style="font-size:11.5px;">
+            🎯 Ajustar cantos
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // =========================================================================
+    // 1. CONSTANTES DE IMAGEM EMBUTIDA
+    // =========================================================================
+    const EMBEDDED_MONITOR_HOMEM = "";
+    const EMBEDDED_MONITOR_MULHER = "";
+
+    // =========================================================================
+    // 2. RESOLUÇÃO NATIVA (1695 x 928) E COORDENADAS CALIBRADAS
+    // =========================================================================
+    const CANVAS_W = 1695;
+    const CANVAS_H = 928;
+
+    const ESTADO_LIMPO_PADRAO = {
+      matricula: '749.152-2',
+      dataHora: '',
+      ag: '',
+      produto: '237',
+      pag: '001',
+      conta: '',
+      nome: '',
+      cpfcnpj: '',
+      dataAtualizacao: '',
+      endereco: '',
+      cep: '',
+      bairro: '',
+      uf: '',
+      cidade: '',
+      situacao: '',
+      situacaoCadastral: '',
+      moduloTopaz: 'INATIVO',
+      usuario: '',
+      celular: '',
+      email: '',
+      responsaveis: []
+    };
+
+    const EXEMPLO_PADRAO = {
+      matricula: '749.152-2',
+      dataHora: '24/11/2026 11:10',
+      ag: '0180',
+      produto: '237',
+      pag: '001',
+      conta: '481997-7',
+      nome: 'UMUGRAOS COMERCIO LTDA',
+      cpfcnpj: '05.363.017/0001-27',
+      dataAtualizacao: '****',
+      endereco: '',
+      cep: '',
+      bairro: '',
+      uf: 'PR',
+      cidade: '',
+      situacao: 'ATIVA',
+      situacaoCadastral: 'PENDENTE',
+      moduloTopaz: 'INATIVO',
+      usuario: 'LFR00477',
+      celular: '(44) 99976-2525',
+      email: 'va**@ho*',
+      responsaveis: []
+    };
+
+    const DEFAULT_CORNERS = [
+      { x: 0.084, y: 0.099 },
+      { x: 0.934, y: 0.226 },
+      { x: 0.864, y: 0.970 },
+      { x: 0.084, y: 1.000 }
+    ];
+
+    const STORAGE_KEY = 'terminal_mainframe_state_1695x928_v1';
+    const CORNERS_KEY = 'terminal_monitor_corners_1695x928_v10';
+    const ACTIVE_SLOT_KEY = 'terminal_monitor_active_slot_v1';
+    const DB_NAME = 'TerminalMonitorPhotoDB_1695x928';
+    const DB_STORE = 'photos';
+    const ROWS_PER_PAGE = 3;
+
+    let state = loadState();
+    let corners = loadCorners();
+    let activeSlot = localStorage.getItem(ACTIVE_SLOT_KEY) || 'homem';
+    let slotDataUrls = { homem: "", mulher: "" };
+    let currentPage = 0;
+    let monitorImage = null;
+    let monitorImageDataUrl = "";
+    let isCalibrating = false;
+    let draggingCornerIdx = -1;
+    let cursorVisible = true;
+    let currentUsuariosLista = [];
+
+    const outputCanvas = document.getElementById('outputCanvas');
+    const outCtx = outputCanvas.getContext('2d');
+    const flatCanvas = document.createElement('canvas');
+    flatCanvas.width = CANVAS_W;
+    flatCanvas.height = CANVAS_H;
+    const flatCtx = flatCanvas.getContext('2d');
+
+    function isValidUsuarioValue(v) {
+      if (v === null || v === undefined) return false;
+      const clean = String(v).trim();
+      if (!clean) return false;
+      const low = clean.toLowerCase();
+      return !['null', 'none', 'nan', 'undefined', '-', '--', 'n/a', 'na', 'não informado', 'nao informado', 'sem usuario', 'sem usuário'].includes(low);
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const merged = { ...JSON.parse(JSON.stringify(ESTADO_LIMPO_PADRAO)), ...parsed };
+          if (!merged.matricula) merged.matricula = '749.152-2';
+          if (!merged.produto) merged.produto = '237';
+          if (!merged.pag) merged.pag = '001';
+          if (!merged.moduloTopaz) merged.moduloTopaz = 'INATIVO';
+          return merged;
+        }
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(ESTADO_LIMPO_PADRAO));
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    function loadCorners() {
+      try {
+        const raw = localStorage.getItem(CORNERS_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length === 4) return parsed;
+        }
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(DEFAULT_CORNERS));
+    }
+
+    function saveCorners() {
+      try {
+        localStorage.setItem(CORNERS_KEY, JSON.stringify(corners));
+      } catch (e) {}
+    }
+
+    function resetDefaultCorners() {
+      corners = JSON.parse(JSON.stringify(DEFAULT_CORNERS));
+      saveCorners();
+      renderScene();
+      showToast('Posição padrão restaurada!');
+    }
+
+    // =========================================================================
+    // 3. PERSISTÊNCIA DAS FOTOS DO MONITOR (HOMEM E MULHER)
+    // =========================================================================
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        el.classList.remove('show');
+      }, 3200);
+    }
+
+    function openPhotoDB() {
+      return new Promise((resolve, reject) => {
+        try {
+          const req = indexedDB.open(DB_NAME, 1);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(DB_STORE)) {
+              db.createObjectStore(DB_STORE);
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+
+    async function savePhotoToDB(slot, dataUrl) {
+      try {
+        const db = await openPhotoDB();
+        const tx = db.transaction(DB_STORE, 'readwrite');
+        tx.objectStore(DB_STORE).put(dataUrl, `monitor_bg_${slot}`);
+      } catch (e) {}
+    }
+
+    async function loadPhotoFromDB(slot) {
+      try {
+        const db = await openPhotoDB();
+        return new Promise((resolve) => {
+          const tx = db.transaction(DB_STORE, 'readonly');
+          const req = tx.objectStore(DB_STORE).get(`monitor_bg_${slot}`);
+          req.onsuccess = () => {
+            if (req.result) {
+              resolve(req.result);
+            } else if (slot === 'homem') {
+              const legacyReq = tx.objectStore(DB_STORE).get('monitor_bg');
+              legacyReq.onsuccess = () => resolve(legacyReq.result || null);
+              legacyReq.onerror = () => resolve(null);
+            } else {
+              resolve(null);
+            }
+          };
+          req.onerror = () => resolve(null);
+        });
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function updateSlotButtonsUI() {
+      const btnH = document.getElementById('btnSelectHomem');
+      const btnM = document.getElementById('btnSelectMulher');
+      if (btnH) {
+        btnH.style.borderColor = activeSlot === 'homem' ? '#2b82d9' : '#233140';
+        btnH.style.backgroundColor = activeSlot === 'homem' ? 'rgba(43, 130, 217, 0.25)' : '#16202b';
+        btnH.style.color = activeSlot === 'homem' ? '#ffffff' : '#e2e8f0';
+      }
+      if (btnM) {
+        btnM.style.borderColor = activeSlot === 'mulher' ? '#2b82d9' : '#233140';
+        btnM.style.backgroundColor = activeSlot === 'mulher' ? 'rgba(43, 130, 217, 0.25)' : '#16202b';
+        btnM.style.color = activeSlot === 'mulher' ? '#ffffff' : '#e2e8f0';
+      }
+    }
+
+    function applyMonitorImage(src, slot = activeSlot, shouldSaveDB = false) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          monitorImage = img;
+          monitorImageDataUrl = src;
+          if (src.startsWith('data:')) {
+            slotDataUrls[slot] = src;
+          }
+          const overlay = document.getElementById('emptyPhotoOverlay');
+          if (overlay) overlay.style.display = 'none';
+          const btnExport = document.getElementById('btnExportEmbedded');
+          if (btnExport && (slotDataUrls.homem || slotDataUrls.mulher)) {
+            btnExport.style.display = 'inline-flex';
+          }
+          if (shouldSaveDB && src.startsWith('data:')) {
+            savePhotoToDB(slot, src);
+          }
+          updateSlotButtonsUI();
+          renderScene();
+          resolve(true);
+        };
+        img.onerror = () => resolve(false);
+        img.src = src;
+      });
+    }
+
+    async function loadSlotPhoto(slot, promptIfMissing = false) {
+      activeSlot = slot;
+      try {
+        localStorage.setItem(ACTIVE_SLOT_KEY, slot);
+      } catch (e) {}
+      updateSlotButtonsUI();
+
+      const embeddedSrc = slot === 'mulher' ? EMBEDDED_MONITOR_MULHER : EMBEDDED_MONITOR_HOMEM;
+      if (embeddedSrc && embeddedSrc.startsWith('data:')) {
+        if (await applyMonitorImage(embeddedSrc, slot, false)) return true;
+      }
+
+      if (slotDataUrls[slot]) {
+        if (await applyMonitorImage(slotDataUrls[slot], slot, false)) return true;
+      }
+
+      const savedDataUrl = await loadPhotoFromDB(slot);
+      if (savedDataUrl) {
+        if (await applyMonitorImage(savedDataUrl, slot, false)) return true;
+      }
+
+      const candidates = slot === 'mulher'
+        ? ['./mulher.png', './mulher.jpg', './monitor_mulher.png', './monitor_mulher.jpg', 'mulher.png', 'mulher.jpg']
+        : ['./homem.png', './homem.jpg', './monitor_homem.png', './monitor_homem.jpg', './monitor.png', 'homem.png', 'homem.jpg'];
+
+      for (const path of candidates) {
+        if (await applyMonitorImage(path, slot, false)) return true;
+      }
+
+      if (promptIfMissing) {
+        showToast(`Selecione agora a foto do monitor (${slot === 'mulher' ? 'Mulher' : 'Homem'}) para salvar neste botão!`);
+        document.getElementById('bgFileInput').click();
+      } else {
+        renderScene();
+      }
+      return false;
+    }
+
+    async function selectMonitorSlot(slot) {
+      const ok = await loadSlotPhoto(slot, true);
+      if (ok) {
+        showToast(`Imagem (${slot === 'mulher' ? 'Mulher' : 'Homem'}) selecionada!`);
+      }
+    }
+
+    function triggerUploadForCurrentSlot() {
+      document.getElementById('bgFileInput').click();
+    }
+
+    async function initMonitorPhoto() {
+      const savedH = await loadPhotoFromDB('homem');
+      if (savedH) slotDataUrls.homem = savedH;
+      const savedM = await loadPhotoFromDB('mulher');
+      if (savedM) slotDataUrls.mulher = savedM;
+
+      await loadSlotPhoto(activeSlot, false);
+    }
+
+    function handleBgUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const dataUrl = e.target.result;
+        const ok = await applyMonitorImage(dataUrl, activeSlot, true);
+        if (ok) {
+          showToast(`Foto (${activeSlot === 'mulher' ? 'Mulher' : 'Homem'}) salva!`);
+        } else {
+          showToast('Não foi possível ler esta imagem.');
+        }
+        event.target.value = '';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function downloadEmbeddedHTML() {
+      const srcH = slotDataUrls.homem || EMBEDDED_MONITOR_HOMEM || "";
+      const srcM = slotDataUrls.mulher || EMBEDDED_MONITOR_MULHER || "";
+      if (!srcH && !srcM) {
+        showToast('Carregue primeiro pelo menos uma foto do monitor.');
+        return;
+      }
+      const docHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      let updatedHtml = docHtml.replace(
+        /const EMBEDDED_MONITOR_HOMEM = "[^"]*";/,
+        `const EMBEDDED_MONITOR_HOMEM = "${srcH}";`
+      );
+      updatedHtml = updatedHtml.replace(
+        /const EMBEDDED_MONITOR_MULHER = "[^"]*";/,
+        `const EMBEDDED_MONITOR_MULHER = "${srcM}";`
+      );
+      const blob = new Blob([updatedHtml], { type: 'text/html;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'index.html';
+      link.click();
+      showToast('Arquivo index.html com as fotos embutidas foi baixado!');
+    }
+
+    // =========================================================================
+    // 4. PAGINAÇÃO E FORMATAÇÃO DE VALORES
+    // =========================================================================
+    function valOrDash(v) {
+      const trimmed = String(v || '').trim();
+      return trimmed.length > 0 ? trimmed : '-';
+    }
+
+    function valOrEmpty(v) {
+      return String(v || '').trim();
+    }
+
+    function isAlertStatus(val) {
+      const upper = String(val || '').trim().toUpperCase();
+      return ['PENDENTE', 'INATIVO', 'INATIVA', 'BAIXADA', 'EM ANÁLISE', 'EXPIRADO', 'VENCIDO', 'IRREGULAR', 'CANCELADA', 'BLOQUEADA', 'SUSPENSA', '****'].includes(upper);
+    }
+
+    function getTotalPages() {
+      const total = Math.ceil((state.responsaveis ? state.responsaveis.length : 0) / ROWS_PER_PAGE);
+      return Math.max(1, total);
+    }
+
+    function getFormattedPageNumber() {
+      const baseNum = parseInt(state.pag || '1', 10);
+      const effectivePage = (isNaN(baseNum) ? 1 : baseNum) + currentPage;
+      return String(effectivePage).padStart(3, '0');
+    }
+
+    function updatePaginationUI() {
+      const totalPages = getTotalPages();
+      if (currentPage >= totalPages) {
+        currentPage = totalPages - 1;
+      }
+      if (currentPage < 0) currentPage = 0;
+
+      const indicator = document.getElementById('pageIndicator');
+      if (indicator) {
+        indicator.textContent = `Visualização ${currentPage + 1} de ${totalPages}`;
+      }
+      const btnPrev = document.getElementById('btnPrevPage');
+      const btnNext = document.getElementById('btnNextPage');
+      if (btnPrev) btnPrev.disabled = currentPage <= 0;
+      if (btnNext) btnNext.disabled = currentPage >= totalPages - 1;
+    }
+
+    function changePage(delta) {
+      const totalPages = getTotalPages();
+      currentPage = Math.max(0, Math.min(totalPages - 1, currentPage + delta));
+      updatePaginationUI();
+      renderScene();
+    }
+
+    // =========================================================================
+    // 5. RENDERIZAÇÃO DO TEXTO DO TERMINAL EM ALTA DEFINIÇÃO (1695 x 928)
+    // =========================================================================
+    let sampledTextColor = '#9dc5eb';
+
+    function sampleMonitorTone() {
+      if (!monitorImage) {
+        sampledTextColor = '#9dc5eb';
+        return;
+      }
+      try {
+        const tmp = document.createElement('canvas');
+        tmp.width = 160;
+        tmp.height = 90;
+        const tctx = tmp.getContext('2d');
+        tctx.drawImage(monitorImage, 0, 0, 160, 90);
+        const data = tctx.getImageData(30, 25, 100, 45).data;
+        let rSum = 0, gSum = 0, bSum = 0, count = 0;
+        for (let i = 0; i < data.length; i += 16) {
+          rSum += data[i];
+          gSum += data[i + 1];
+          bSum += data[i + 2];
+          count++;
+        }
+        const avgR = rSum / count;
+        const avgG = gSum / count;
+        const avgB = bSum / count;
+        const r = Math.min(210, Math.max(145, Math.round(145 + avgR * 0.65)));
+        const g = Math.min(230, Math.max(188, Math.round(186 + avgG * 0.55)));
+        const b = Math.min(252, Math.max(228, Math.round(224 + avgB * 0.45)));
+        sampledTextColor = `rgb(${r}, ${g}, ${b})`;
+      } catch (e) {
+        sampledTextColor = '#9dc5eb';
+      }
+    }
+
+    function drawTermText(ctx, text, x, y, color = null, align = 'left', maxWidth = null) {
+      const finalColor = color || sampledTextColor;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(1, 1.12);
+      ctx.textAlign = align;
+      ctx.fillStyle = finalColor;
+      ctx.shadowColor = finalColor === '#e03c4d' ? 'rgba(224, 60, 77, 0.36)' : 'rgba(130, 185, 245, 0.34)';
+      ctx.shadowBlur = 3.2;
+      if (maxWidth) {
+        ctx.fillText(text, 0, 0, maxWidth);
+      } else {
+        ctx.fillText(text, 0, 0);
+      }
+      ctx.restore();
+    }
+
+    function renderFlatTerminalText(showCursor) {
+      const W = flatCanvas.width;
+      const H = flatCanvas.height;
+      flatCtx.clearRect(0, 0, W, H);
+
+      const COLOR_NORMAL = sampledTextColor;
+      const COLOR_ALERT = '#e03c4d';
+
+      flatCtx.font = '600 28px "Courier New", "Lucida Console", monospace';
+      flatCtx.textBaseline = 'top';
+
+      const leftX = 24;
+      const rightEdgeX = 1650;
+      const dashedLine = '-'.repeat(98);
+
+      drawTermText(flatCtx, `MATRÍCULA: ${valOrDash(state.matricula).toUpperCase()}`, leftX, 14, COLOR_NORMAL);
+      drawTermText(flatCtx, valOrDash(state.dataHora).toUpperCase(), rightEdgeX, 14, COLOR_NORMAL, 'right');
+
+      drawTermText(flatCtx, `#CONFIDENCIAL`, leftX, 50, COLOR_NORMAL);
+      drawTermText(flatCtx, `#SISTEMA INTERNO`, rightEdgeX, 50, COLOR_NORMAL, 'right');
+
+      drawTermText(flatCtx, dashedLine, leftX, 84, COLOR_NORMAL);
+
+      drawTermText(flatCtx, `AG: ${valOrDash(state.ag).toUpperCase()}`, leftX, 124, COLOR_NORMAL);
+      drawTermText(flatCtx, `PRODUTO: ${valOrDash(state.produto).toUpperCase()}`, 415, 124, COLOR_NORMAL);
+      drawTermText(flatCtx, `CONTA: ${valOrDash(state.conta).toUpperCase()}`, 885, 124, COLOR_NORMAL);
+      drawTermText(flatCtx, `PAG: ${getFormattedPageNumber()}`, rightEdgeX, 124, COLOR_NORMAL, 'right');
+
+      drawTermText(flatCtx, `RAZÃO SOCIAL: ${valOrDash(state.nome).toUpperCase()}`, leftX, 166, COLOR_NORMAL);
+      drawTermText(flatCtx, `CPF/CNPJ: ${valOrDash(state.cpfcnpj).toUpperCase()}`, rightEdgeX, 166, COLOR_NORMAL, 'right');
+
+      drawTermText(flatCtx, `ENDERECO: ${valOrDash(state.endereco).toUpperCase()}`, leftX, 224, COLOR_NORMAL);
+      drawTermText(flatCtx, `CEP: ${valOrDash(state.cep).toUpperCase()}`, leftX, 258, COLOR_NORMAL);
+
+      drawTermText(flatCtx, `UF: ${valOrDash(state.uf).toUpperCase()}`, leftX, 292, COLOR_NORMAL);
+      drawTermText(flatCtx, `BAIRRO: ${valOrDash(state.bairro).toUpperCase()}`, 880, 292, COLOR_NORMAL);
+
+      const sitLabel = 'SITUACAO: ';
+      const sitVal = valOrDash(state.situacao).toUpperCase();
+      drawTermText(flatCtx, sitLabel, leftX, 326, COLOR_NORMAL);
+      drawTermText(flatCtx, sitVal, leftX + flatCtx.measureText(sitLabel).width, 326, isAlertStatus(sitVal) ? COLOR_ALERT : COLOR_NORMAL);
+      drawTermText(flatCtx, `CIDADE: ${valOrDash(state.cidade).toUpperCase()}`, 880, 326, COLOR_NORMAL);
+
+      const sitCadLabel = 'SITUACAO CADASTRAL: ';
+      const sitCadVal = valOrDash(state.situacaoCadastral).toUpperCase();
+      drawTermText(flatCtx, sitCadLabel, leftX, 360, COLOR_NORMAL);
+      drawTermText(flatCtx, sitCadVal, leftX + flatCtx.measureText(sitCadLabel).width, 360, isAlertStatus(sitCadVal) ? COLOR_ALERT : COLOR_NORMAL);
+
+      const topazLabel = 'MODULO TOPAZ: ';
+      const topazVal = valOrDash(state.moduloTopaz).toUpperCase();
+      drawTermText(flatCtx, topazLabel, leftX, 394, COLOR_NORMAL);
+      drawTermText(flatCtx, topazVal, leftX + flatCtx.measureText(topazLabel).width, 394, isAlertStatus(topazVal) ? COLOR_ALERT : COLOR_NORMAL);
+
+      // USUARIO: só aparece quando preenchido com valor válido
+      const usuarioLimpo = isValidUsuarioValue(state.usuario) ? String(state.usuario).trim().toUpperCase() : '';
+      if (usuarioLimpo) {
+        drawTermText(flatCtx, `USUARIO: ${usuarioLimpo}`, leftX, 428, COLOR_NORMAL, 'left', rightEdgeX - leftX);
+      }
+
+      drawTermText(flatCtx, `CELULAR: ${valOrDash(state.celular).toUpperCase()}`, leftX, 474, COLOR_NORMAL);
+      // EMAIL: só aparece quando preenchido com valor válido
+      if (isValidEmailValue(state.email)) {
+        drawTermText(flatCtx, `EMAIL: ${valOrEmpty(state.email)}`, leftX, 508, COLOR_NORMAL);
+      }
+
+      drawTermText(flatCtx, dashedLine, leftX, 544, COLOR_NORMAL);
+
+      const dtAtuLabel = 'DATA ULTIMA ATUALIZACAO: ';
+      const dtAtuVal = valOrDash(state.dataAtualizacao).toUpperCase();
+      drawTermText(flatCtx, dtAtuLabel, leftX, 580, COLOR_NORMAL);
+      drawTermText(flatCtx, dtAtuVal, leftX + flatCtx.measureText(dtAtuLabel).width, 580, isAlertStatus(dtAtuVal) ? COLOR_ALERT : COLOR_NORMAL);
+
+      const colN = leftX;
+      const colCargo = 148;
+      const colNome = 520;
+      const colCpf = 1040;
+      const colContato = 1365;
+      const tableHeaderY = 626;
+
+      const startIdx = currentPage * ROWS_PER_PAGE;
+      const pageItems = (state.responsaveis || []).slice(startIdx, startIdx + ROWS_PER_PAGE);
+
+      const activeItems = pageItems.filter(resp =>
+        valOrEmpty(resp.cargo) || valOrEmpty(resp.nome) || valOrEmpty(resp.cpf) || valOrEmpty(resp.contato)
+      );
+
+      if (activeItems.length > 0) {
+        const hasCargo = activeItems.some(r => valOrEmpty(r.cargo).length > 0);
+        const hasNome = activeItems.some(r => valOrEmpty(r.nome).length > 0);
+        const hasCpf = activeItems.some(r => valOrEmpty(r.cpf).length > 0);
+        const hasContato = activeItems.some(r => valOrEmpty(r.contato).length > 0);
+
+        drawTermText(flatCtx, 'N', colN, tableHeaderY, COLOR_NORMAL);
+        if (hasCargo) drawTermText(flatCtx, 'CARGO', colCargo, tableHeaderY, COLOR_NORMAL);
+        if (hasNome) drawTermText(flatCtx, 'NOME', colNome, tableHeaderY, COLOR_NORMAL);
+        if (hasCpf) drawTermText(flatCtx, 'CPF', colCpf, tableHeaderY, COLOR_NORMAL);
+        if (hasContato) drawTermText(flatCtx, 'CONTATO', colContato, tableHeaderY, COLOR_NORMAL);
+
+        activeItems.forEach((resp, idx) => {
+          const rowY = 662 + idx * 32;
+          const cargoFmt = valOrEmpty(resp.cargo).toUpperCase().slice(0, 20);
+          const nomeFmt = valOrEmpty(resp.nome).toUpperCase().slice(0, 28);
+          const cpfFmt = formatarCPF(valOrEmpty(resp.cpf)).toUpperCase().slice(0, 18);
+          const contatoFmt = formatarTelefone(valOrEmpty(resp.contato)).toUpperCase().slice(0, 18);
+
+          drawTermText(flatCtx, String(startIdx + idx + 1), colN, rowY, COLOR_NORMAL);
+          if (cargoFmt) drawTermText(flatCtx, cargoFmt, colCargo, rowY, COLOR_NORMAL);
+          if (nomeFmt) drawTermText(flatCtx, nomeFmt, colNome, rowY, COLOR_NORMAL);
+          if (cpfFmt) drawTermText(flatCtx, cpfFmt, colCpf, rowY, COLOR_NORMAL);
+          if (contatoFmt) drawTermText(flatCtx, contatoFmt, colContato, rowY, COLOR_NORMAL);
+        });
+      }
+
+      const consText = showCursor ? 'CONS EFETUADA _' : 'CONS EFETUADA';
+      drawTermText(flatCtx, consText, leftX, 774, COLOR_NORMAL);
+      drawTermText(flatCtx, dashedLine, leftX, 810, COLOR_NORMAL);
+
+      const fKeyY = 856;
+      drawTermText(flatCtx, 'F01 - AJUDA', leftX, fKeyY, COLOR_NORMAL);
+      drawTermText(flatCtx, 'F03 - RETORNAR', 445, fKeyY, COLOR_NORMAL);
+      drawTermText(flatCtx, 'F04 - MENU', 895, fKeyY, COLOR_NORMAL);
+      drawTermText(flatCtx, 'F05 - DETALHE', 1300, fKeyY, COLOR_NORMAL);
+    }
+
+    // =========================================================================
+    // 6. PROJEÇÃO EM PERSPECTIVA PROJETIVA REAL (HOMOGRAFIA 2D + MALHA 28 x 20)
+    // =========================================================================
+    function computeHomography(p0, p1, p2, p3) {
+      const dx1 = p1.x - p2.x;
+      const dy1 = p1.y - p2.y;
+      const dx2 = p3.x - p2.x;
+      const dy2 = p3.y - p2.y;
+      const dx3 = p0.x - p1.x + p2.x - p3.x;
+      const dy3 = p0.y - p1.y + p2.y - p3.y;
+
+      const det = dx1 * dy2 - dx2 * dy1;
+      if (Math.abs(det) < 1e-8) {
+        return null;
+      }
+
+      const g = (dx3 * dy2 - dx2 * dy3) / det;
+      const h = (dx1 * dy3 - dx3 * dy1) / det;
+      const a = p1.x - p0.x + g * p1.x;
+      const b = p3.x - p0.x + h * p3.x;
+      const c = p0.x;
+      const d = p1.y - p0.y + g * p1.y;
+      const e = p3.y - p0.y + h * p3.y;
+      const f = p0.y;
+
+      return { a, b, c, d, e, f, g, h };
+    }
+
+    function projectPoint(H, p0, p1, p2, p3, u, v) {
+      if (!H) {
+        const topX = p0.x + (p1.x - p0.x) * u;
+        const topY = p0.y + (p1.y - p0.y) * u;
+        const botX = p3.x + (p2.x - p3.x) * u;
+        const botY = p3.y + (p2.y - p3.y) * u;
+        return {
+          x: topX + (botX - topX) * v,
+          y: topY + (botY - topY) * v
+        };
+      }
+      const w = H.g * u + H.h * v + 1;
+      return {
+        x: (H.a * u + H.b * v + H.c) / w,
+        y: (H.d * u + H.e * v + H.f) / w
+      };
+    }
+
+    function drawTexturedTriangle(ctx, img, sx0, sy0, sx1, sy1, sx2, sy2, dx0, dy0, dx1, dy1, dx2, dy2) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(dx0, dy0);
+      ctx.lineTo(dx1, dy1);
+      ctx.lineTo(dx2, dy2);
+      ctx.closePath();
+      ctx.clip();
+
+      const denom = (sx0 - sx2) * (sy1 - sy2) - (sx1 - sx2) * (sy0 - sy2);
+      if (Math.abs(denom) < 1e-6) {
+        ctx.restore();
+        return;
+      }
+
+      const m11 = ((dx0 - dx2) * (sy1 - sy2) - (dx1 - dx2) * (sy0 - sy2)) / denom;
+      const m12 = ((dy0 - dy2) * (sy1 - sy2) - (dy1 - dy2) * (sy0 - sy2)) / denom;
+      const m21 = ((sx0 - sx2) * (dx1 - dx2) - (sx1 - sx2) * (dx0 - dx2)) / denom;
+      const m22 = ((sx0 - sx2) * (dy1 - dy2) - (sx1 - sx2) * (dy0 - dy2)) / denom;
+      const dx = dx2 - m11 * sx2 - m21 * sy2;
+      const dy = dy2 - m12 * sx2 - m22 * sy2;
+
+      ctx.transform(m11, m12, m21, m22, dx, dy);
+      ctx.drawImage(img, 0, 0);
+      ctx.restore();
+    }
+
+    function drawPerspectiveOverlay(ctx, srcImg, destPts, cols = 28, rows = 20) {
+      const sw = srcImg.width;
+      const sh = srcImg.height;
+      const H = computeHomography(destPts[0], destPts[1], destPts[2], destPts[3]);
+
+      for (let r = 0; r < rows; r++) {
+        const v0 = r / rows;
+        const v1 = (r + 1) / rows;
+        const sy0 = v0 * sh;
+        const sy1 = v1 * sh;
+
+        for (let c = 0; c < cols; c++) {
+          const u0 = c / cols;
+          const u1 = (c + 1) / cols;
+          const sx0 = u0 * sw;
+          const sx1 = u1 * sw;
+
+          const p00 = projectPoint(H, destPts[0], destPts[1], destPts[2], destPts[3], u0, v0);
+          const p10 = projectPoint(H, destPts[0], destPts[1], destPts[2], destPts[3], u1, v0);
+          const p11 = projectPoint(H, destPts[0], destPts[1], destPts[2], destPts[3], u1, v1);
+          const p01 = projectPoint(H, destPts[0], destPts[1], destPts[2], destPts[3], u0, v1);
+
+          const cx = (p00.x + p10.x + p11.x + p01.x) * 0.25;
+          const cy = (p00.y + p10.y + p11.y + p01.y) * 0.25;
+          const expand = (p) => ({
+            x: p.x + (p.x - cx) * 0.008,
+            y: p.y + (p.y - cy) * 0.008
+          });
+
+          const e00 = expand(p00);
+          const e10 = expand(p10);
+          const e11 = expand(p11);
+          const e01 = expand(p01);
+
+          drawTexturedTriangle(ctx, srcImg, sx0, sy0, sx1, sy0, sx1, sy1, e00.x, e00.y, e10.x, e10.y, e11.x, e11.y);
+          drawTexturedTriangle(ctx, srcImg, sx0, sy0, sx1, sy1, sx0, sy1, e00.x, e00.y, e11.x, e11.y, e01.x, e01.y);
+        }
+      }
+    }
+
+    // =========================================================================
+    // 7. COMPOSIÇÃO DA CENA NO CANVAS (1695 x 928)
+    // =========================================================================
+    function renderScene(forceCursor = null) {
+      const showCursor = forceCursor !== null ? forceCursor : cursorVisible;
+      sampleMonitorTone();
+      renderFlatTerminalText(showCursor);
+
+      const W = outputCanvas.width;
+      const H = outputCanvas.height;
+      outCtx.clearRect(0, 0, W, H);
+
+      if (monitorImage) {
+        outCtx.drawImage(monitorImage, 0, 0, W, H);
+      } else {
+        outCtx.fillStyle = '#09111e';
+        outCtx.fillRect(0, 0, W, H);
+      }
+
+      const pts = corners.map(c => ({
+        x: c.x * W,
+        y: c.y * H
+      }));
+      outCtx.save();
+      outCtx.globalAlpha = 0.88;
+      outCtx.filter = 'blur(0.38px)';
+      outCtx.globalCompositeOperation = 'screen';
+      drawPerspectiveOverlay(outCtx, flatCanvas, pts, 28, 20);
+      outCtx.restore();
+
+      updateCalibrationUI();
+    }
+
+    // =========================================================================
+    // 8. CALIBRAÇÃO INTERATIVA DOS 4 CANTOS
+    // =========================================================================
+    function toggleCalibration() {
+      isCalibrating = !isCalibrating;
+      const overlay = document.getElementById('calibrationOverlay');
+      const btn = document.getElementById('btnCalibrate');
+      const resetBtn = document.getElementById('btnResetCorners');
+
+      if (isCalibrating) {
+        overlay.classList.add('active');
+        btn.textContent = '✅ Concluir ajuste';
+        resetBtn.style.display = 'inline-block';
+        showToast('Arraste os 4 pontos amarelos para alinhar o texto dentro da tela.');
+      } else {
+        overlay.classList.remove('active');
+        btn.textContent = '🎯 Ajustar cantos';
+        resetBtn.style.display = 'none';
+      }
+      updateCalibrationUI();
+    }
+
+    function updateCalibrationUI() {
+      if (!isCalibrating) return;
+      const handles = document.querySelectorAll('.corner-handle');
+      const poly = document.getElementById('calibPoly');
+      const box = document.getElementById('monitorBox');
+      const rect = box.getBoundingClientRect();
+
+      const polyPoints = [];
+      handles.forEach((h, idx) => {
+        const c = corners[idx];
+        h.style.left = (c.x * 100) + '%';
+        h.style.top = (c.y * 100) + '%';
+        polyPoints.push(`${c.x * rect.width},${c.y * rect.height}`);
+      });
+
+      poly.setAttribute('points', polyPoints.join(' '));
+    }
+
+    document.querySelectorAll('.corner-handle').forEach(handle => {
+      const startDrag = (e) => {
+        e.preventDefault();
+        draggingCornerIdx = parseInt(handle.getAttribute('data-corner'), 10);
+      };
+      handle.addEventListener('mousedown', startDrag);
+      handle.addEventListener('touchstart', startDrag, { passive: false });
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (draggingCornerIdx < 0) return;
+      moveCorner(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      if (draggingCornerIdx < 0 || !e.touches[0]) return;
+      moveCorner(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+
+    window.addEventListener('mouseup', () => {
+      if (draggingCornerIdx >= 0) {
+        draggingCornerIdx = -1;
+        saveCorners();
+      }
+    });
+
+    window.addEventListener('touchend', () => {
+      if (draggingCornerIdx >= 0) {
+        draggingCornerIdx = -1;
+        saveCorners();
+      }
+    });
+
+    function moveCorner(clientX, clientY) {
+      const box = document.getElementById('monitorBox');
+      const rect = box.getBoundingClientRect();
+      const nx = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      const ny = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+      corners[draggingCornerIdx] = { x: nx, y: ny };
+      renderScene();
+    }
+
+    window.addEventListener('resize', updateCalibrationUI);
+
+    // =========================================================================
+    // 9. EXPORTAR PNG (1695 x 928) E COPIAR TEXTO DO TERMINAL
+    // =========================================================================
+    function downloadPNG() {
+      if (isCalibrating) {
+        toggleCalibration();
+      }
+      setNowDateTime();
+      renderScene(true);
+      const link = document.createElement('a');
+      const safeConta = (state.conta || 'sistema_interno').replace(/[^a-zA-Z0-9_-]/g, '_');
+      link.download = `tela_sistema_${safeConta}_pag${getFormattedPageNumber()}.png`;
+      link.href = outputCanvas.toDataURL('image/png');
+      link.click();
+      showToast(`Imagem PNG baixada com data/hora atual (${state.dataHora})!`);
+    }
+
+    function buildPlainTerminalText() {
+      const startIdx = currentPage * ROWS_PER_PAGE;
+      const pageItems = (state.responsaveis || []).slice(startIdx, startIdx + ROWS_PER_PAGE);
+
+      const lines = [
+        `MATRÍCULA: ${valOrDash(state.matricula).toUpperCase()}                                                   ${valOrDash(state.dataHora).toUpperCase()}`,
+        `#CONFIDENCIAL                                                 #SISTEMA INTERNO`,
+        `ENDERECO: ${valOrDash(state.endereco).toUpperCase()}`,
+        `CEP: ${valOrDash(state.cep).toUpperCase()}`,
+        `UF: ${valOrDash(state.uf).toUpperCase()}                                       BAIRRO: ${valOrDash(state.bairro).toUpperCase()}`,
+        `SITUACAO: ${valOrDash(state.situacao).toUpperCase()}                          CIDADE: ${valOrDash(state.cidade).toUpperCase()}`,
+        `SITUACAO CADASTRAL: ${valOrDash(state.situacaoCadastral).toUpperCase()}`,
+        `MODULO TOPAZ: ${valOrDash(state.moduloTopaz).toUpperCase()}`
+      ];
+
+      if (isValidUsuarioValue(state.usuario)) {
+        lines.push(`USUARIO: ${String(state.usuario).trim().toUpperCase()}`);
+      }
+
+      lines.push(``);
+      lines.push(`CELULAR: ${valOrDash(state.celular).toUpperCase()}`);
+      if (isValidEmailValue(state.email)) {
+        lines.push(`EMAIL: ${valOrEmpty(state.email)}`);
+      }
+      lines.push(`--------------------------------------------------------------------------------`);
+      lines.push(``);
+      lines.push(`DATA ULTIMA ATUALIZACAO: ${valOrDash(state.dataAtualizacao).toUpperCase()}`);
+      lines.push(``);
+
+      const activeItems = pageItems.filter(resp =>
+        valOrEmpty(resp.cargo) || valOrEmpty(resp.nome) || valOrEmpty(resp.cpf) || valOrEmpty(resp.contato)
+      );
+
+      if (activeItems.length > 0) {
+        lines.push(`N   CARGO             NOME                         CPF                CONTATO`);
+        activeItems.forEach((resp, idx) => {
+          const n = String(startIdx + idx + 1).padEnd(3, ' ');
+          const cargo = valOrEmpty(resp.cargo).toUpperCase().padEnd(17, ' ');
+          const nome = valOrEmpty(resp.nome).toUpperCase().padEnd(28, ' ');
+          const cpf = formatarCPF(valOrEmpty(resp.cpf)).toUpperCase().padEnd(18, ' ');
+          const contato = formatarTelefone(valOrEmpty(resp.contato)).toUpperCase();
+          lines.push(`${n} ${cargo} ${nome} ${cpf} ${contato}`);
+        });
+      }
+
+      lines.push(``);
+      lines.push(`CONS EFETUADA`);
+      lines.push(`--------------------------------------------------------------------------------`);
+      lines.push(``);
+      lines.push(`F01 - AJUDA          F03 - RETORNAR        F04 - MENU          F05 - DETALHE`);
+
+      return lines.join('\n');
+    }
+
+    function copyTerminalText() {
+      const text = buildPlainTerminalText();
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        const btn = document.getElementById('btnCopyText');
+        const oldLabel = btn.textContent;
+        btn.textContent = 'Copiado!';
+        showToast('Texto da tela copiado para a área de transferência!');
+        setTimeout(() => {
+          btn.textContent = oldLabel;
+        }, 2000);
+      } catch (e) {
+        showToast('Não foi possível copiar automaticamente.');
+      }
+      document.body.removeChild(ta);
+    }
+
+    // =========================================================================
+    // 10. FORMULÁRIO ESQUERDO, CONSULTA CNPJ E RESPONSÁVEIS
+    // =========================================================================
+    function switchSidebarTab(tabName) {
+      const btnTerm = document.getElementById('tabBtnTerminal');
+      const btnCnpj = document.getElementById('tabBtnCnpj');
+      const panelTerm = document.getElementById('tabPanelTerminal');
+      const panelCnpj = document.getElementById('tabPanelCnpj');
+
+      if (tabName === 'cnpj') {
+        btnTerm.classList.remove('active');
+        btnCnpj.classList.add('active');
+        panelTerm.style.display = 'none';
+        panelCnpj.style.display = 'flex';
+        const cnpjTabInput = document.getElementById('cnpjTabInput');
+        if (cnpjTabInput && !cnpjTabInput.value.trim() && state.cpfcnpj) {
+          cnpjTabInput.value = state.cpfcnpj;
+        }
+      } else {
+        btnCnpj.classList.remove('active');
+        btnTerm.classList.add('active');
+        panelCnpj.style.display = 'none';
+        panelTerm.style.display = 'flex';
+      }
+    }
+
+    function formatarCNPJ(digits) {
+      const d = String(digits || '').replace(/\D/g, '');
+      if (d.length === 14) {
+        return d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+      }
+      return digits;
+    }
+
+    function formatarCPF(digits) {
+      const d = String(digits || '').replace(/\D/g, '');
+      if (d.length === 11) {
+        return d.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+      }
+      return digits;
+    }
+
+    function formatarTelefone(digits) {
+      const d = String(digits || '').replace(/\D/g, '');
+      if (d.length === 11) {
+        return d.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+      }
+      if (d.length === 10) {
+        return d.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3');
+      }
+      return digits;
+    }
+
+    function formatarCEP(digits) {
+      const d = String(digits || '').replace(/\D/g, '');
+      if (d.length === 8) {
+        return d.replace(/^(\d{5})(\d{3})$/, '$1-$2');
+      }
+      return digits;
+    }
+
+    async function fetchCnpjRawData(cnpjLimpo) {
+      const endpoints = [
+        `https://brasilapi.com.br/api/cnpj/v1/${cnpjLimpo}`,
+        `https://minhareceita.org/${cnpjLimpo}`
+      ];
+
+      for (const url of endpoints) {
+        try {
+          const resp = await fetch(url);
+          if (resp.ok) {
+            const dados = await resp.json();
+            if (dados && (dados.razao_social || dados.cep || dados.logradouro)) {
+              return dados;
+            }
+          }
+        } catch (e) {}
+      }
+      return null;
+    }
+
+    async function consultarCNPJOnline(cnpjRaw, sobrescreverEmail = false) {
+      const cnpjLimpo = String(cnpjRaw || '').replace(/\D/g, '');
+      if (cnpjLimpo.length !== 14) {
+        if (sobrescreverEmail) showToast('Informe um CNPJ válido com 14 dígitos para buscar.');
+        return false;
+      }
+
+      showToast('Consultando dados do CNPJ...');
+      const dados = await fetchCnpjRawData(cnpjLimpo);
+
+      if (!dados) {
+        showToast('Não foi possível consultar o CNPJ online no momento.');
+        return false;
+      }
+
+      if (!state.nome && dados.razao_social) {
+        state.nome = dados.razao_social.trim().toUpperCase();
+      }
+
+      const tipoLog = (dados.descricao_tipo_de_logradouro || '').trim();
+      const logradouro = (dados.logradouro || '').trim();
+      const numero = (dados.numero || '').trim();
+      const complemento = (dados.complemento || '').trim();
+      const partesEnd = [
+        [tipoLog, logradouro].filter(Boolean).join(' '),
+        numero,
+        complemento
+      ].filter(Boolean);
+
+      if (partesEnd.length > 0) {
+        state.endereco = partesEnd.join(', ').toUpperCase();
+      }
+
+      if (dados.cep) {
+        state.cep = formatarCEP(dados.cep);
+      }
+      if (dados.bairro) {
+        state.bairro = dados.bairro.trim().toUpperCase();
+      }
+      if (dados.uf) {
+        state.uf = dados.uf.trim().toUpperCase();
+      }
+      if (dados.municipio) {
+        state.cidade = dados.municipio.trim().toUpperCase();
+      }
+
+      if (!state.situacaoCadastral && dados.descricao_situacao_cadastral) {
+        const sitApi = dados.descricao_situacao_cadastral.trim().toUpperCase();
+        state.situacaoCadastral = sitApi;
+        if (['ATIVA', 'INATIVA', 'SUSPENSA', 'BLOQUEADA'].includes(sitApi)) {
+          state.situacao = sitApi;
+        }
+      }
+
+      const emailAtual = String(state.email || '').trim().toLowerCase();
+      if ((!emailAtual || emailAtual === 'none' || emailAtual === '-' || sobrescreverEmail) && dados.email) {
+        state.email = String(dados.email).trim().toLowerCase();
+      }
+
+      const telApi = dados.ddd_telefone_1 || dados.ddd_telefone_2 || '';
+      if (!state.celular && telApi) {
+        state.celular = formatarTelefone(telApi);
+      }
+
+      saveState();
+      syncForm();
+      renderScene();
+      showToast('Dados do CNPJ preenchidos!');
+      return true;
+    }
+
+    async function executarConsultaCnpjAba() {
+      const inputEl = document.getElementById('cnpjTabInput');
+      const btnEl = document.getElementById('btnBuscarCnpjAba');
+      const cnpjLimpo = String(inputEl ? inputEl.value : '').replace(/\D/g, '');
+
+      if (cnpjLimpo.length !== 14) {
+        showToast('Digite um CNPJ válido com 14 dígitos.');
+        return;
+      }
+
+      if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.textContent = '...';
+      }
+      showToast('Buscando informações completas do CNPJ...');
+
+      const dados = await fetchCnpjRawData(cnpjLimpo);
+
+      if (btnEl) {
+        btnEl.disabled = false;
+        btnEl.textContent = 'Buscar';
+      }
+
+      if (!dados) {
+        showToast('Não foi possível obter os dados deste CNPJ.');
+        return;
+      }
+
+      renderizarResultadoCnpjAba(dados, cnpjLimpo);
+      showToast('Informações do CNPJ carregadas!');
+    }
+
+    function renderizarResultadoCnpjAba(dados, cnpjLimpo) {
+      const emptyBox = document.getElementById('cnpjTabEmpty');
+      const resultBox = document.getElementById('cnpjTabResult');
+      const detailsEl = document.getElementById('cnpjTabDetails');
+
+      if (emptyBox) emptyBox.style.display = 'none';
+      if (resultBox) resultBox.style.display = 'flex';
+
+      const tipoLog = (dados.descricao_tipo_de_logradouro || '').trim();
+      const logradouro = (dados.logradouro || '').trim();
+      const numero = (dados.numero || '').trim();
+      const complemento = (dados.complemento || '').trim();
+      const enderecoFmt = [
+        [tipoLog, logradouro].filter(Boolean).join(' '),
+        numero,
+        complemento
+      ].filter(Boolean).join(', ') || '-';
+
+      const telefones = [dados.ddd_telefone_1, dados.ddd_telefone_2]
+        .filter(Boolean)
+        .map(t => formatarTelefone(t))
+        .join(' / ') || '-';
+
+      const capitalFmt = typeof dados.capital_social === 'number'
+        ? dados.capital_social.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+        : (dados.capital_social || '-');
+
+      const cnaeFmt = dados.cnae_fiscal
+        ? `${dados.cnae_fiscal} - ${dados.cnae_fiscal_descricao || ''}`
+        : '-';
+
+      const qsaList = Array.isArray(dados.qsa) ? dados.qsa : [];
+      const qsaHtml = qsaList.length > 0
+        ? qsaList.map(s => `
+            <div style="background:#131b24; border:1px solid #22303e; border-radius:6px; padding:6px 8px; margin-top:4px;">
+              <div style="font-weight:700; color:#e2e8f0;">${escapeHtml(s.nome_socio || '-')}</div>
+              <div style="font-size:10.5px; color:#94a3b8;">${escapeHtml(s.qualificacao_socio || 'Sócio')}${s.cnpj_cpf_do_socio ? ' · ' + escapeHtml(s.cnpj_cpf_do_socio) : ''}</div>
+            </div>
+          `).join('')
+        : '<span style="color:#64748b;">Nenhum sócio retornado</span>';
+
+      detailsEl.innerHTML = `
+        <div class="cnpj-info-row">
+          <span class="cnpj-info-lbl">Razão Social</span>
+          <span class="cnpj-info-val" style="font-weight:700;">${escapeHtml(dados.razao_social || '-')}</span>
+        </div>
+        <div class="cnpj-info-row">
+          <span class="cnpj-info-lbl">Nome Fantasia</span>
+          <span class="cnpj-info-val">${escapeHtml(dados.nome_fantasia || '-')}</span>
+        </div>
+        <div class="cnpj-info-row">
+          <span class="cnpj-info-lbl">CNPJ</span>
+          <span class="cnpj-info-val">${escapeHtml(formatarCNPJ(cnpjLimpo))}</span>
+        </div>
+        <div class="cnpj-info-row">
+          <span class="cnpj-info-lbl">Situação Cadastral</span>
+          <span class="cnpj-info-val" style="color:${String(dados.descricao_situacao_cadastral).toUpperCase() === 'ATIVA' ? '#4ade80' : '#f87171'}; font-weight:700;">
+            ${escapeHtml(dados.descricao_situacao_cadastral || '-')} ${dados.data_situacao_cadastral ? '(' + escapeHtml(dados.data_situacao_cadastral) + ')' : ''}
+          </span>
+        </div>
+        <div class="cnpj-info-row">
+          <span class="cnpj-info-lbl">Data de Abertura</span>
+          <span class="cnpj-info-val">${escapeHtml(dados.data_inicio_atividade || '-')}</span>
+        </div>
+        <div class="cnpj-info-row">
+          <span class="cnpj-info-lbl">Porte / Natureza Jurídica</span>
+          <span class="cnpj-info-val">${escapeHtml(dados.porte || '-')} · ${escapeHtml(dados.natureza_juridica || '-')}</span>
+        </div>
+        <div class="cnpj-info-row">
+          <span class="cnpj-info-lbl">Capital Social</span>
+          <span class="cnpj-info-val">${escapeHtml(capitalFmt)}</span>
+        </div>
+        <div class="cnpj-info-row">
+          <span class="cnpj-info-lbl">CNAE Principal</span>
+          <span class="cnpj-info-val">${escapeHtml(cnaeFmt)}</span>
+        </div>
+        <div class="cnpj-info-row">
+          <span class="cnpj-info-lbl">Endereço</span>
+          <span class="cnpj-info-val">${escapeHtml(enderecoFmt)}</span>
+        </div>
+        <div class="cnpj-info-row">
+          <span class="cnpj-info-lbl">Bairro / Cidade / UF</span>
+          <span class="cnpj-info-val">${escapeHtml(dados.bairro || '-')} - ${escapeHtml(dados.municipio || '-')} / ${escapeHtml(dados.uf || '-')}</span>
+        </div>
+        <div class="cnpj-info-row">
+          <span class="cnpj-info-lbl">CEP</span>
+          <span class="cnpj-info-val">${escapeHtml(dados.cep ? formatarCEP(dados.cep) : '-')}</span>
+        </div>
+        <div class="cnpj-info-row">
+          <span class="cnpj-info-lbl">Telefones</span>
+          <span class="cnpj-info-val">${escapeHtml(telefones)}</span>
+        </div>
+        <div class="cnpj-info-row">
+          <span class="cnpj-info-lbl">E-mail Receita</span>
+          <span class="cnpj-info-val">${escapeHtml(dados.email || 'Não informado na Receita')}</span>
+        </div>
+        <div class="cnpj-info-row">
+          <span class="cnpj-info-lbl">Quadro de Sócios e Administradores (${qsaList.length})</span>
+          <div class="cnpj-info-val">${qsaHtml}</div>
+        </div>
+      `;
+    }
+
+    function limparConsultaCnpjTab() {
+      const inputEl = document.getElementById('cnpjTabInput');
+      const emptyBox = document.getElementById('cnpjTabEmpty');
+      const resultBox = document.getElementById('cnpjTabResult');
+      if (inputEl) inputEl.value = '';
+      if (emptyBox) emptyBox.style.display = 'block';
+      if (resultBox) resultBox.style.display = 'none';
+    }
+
+    function isValidEmailValue(v) {
+      if (!v) return false;
+      const low = v.trim().toLowerCase();
+      return !['none', 'null', 'nan', '-', 'n/a', 'não informado', 'nao informado'].includes(low);
+    }
+
+    function renderMultiUsuarioSelector(lista) {
+      const box = document.getElementById('multiUsuarioBox');
+      const listEl = document.getElementById('multiUsuarioList');
+      const countEl = document.getElementById('multiUsuarioCount');
+      if (!box || !listEl || !countEl) return;
+
+      if (!Array.isArray(lista) || lista.length < 2) {
+        currentUsuariosLista = [];
+        box.style.display = 'none';
+        listEl.innerHTML = '';
+        return;
+      }
+
+      currentUsuariosLista = lista.map(u => String(u).trim().toUpperCase()).filter(Boolean);
+      countEl.textContent = currentUsuariosLista.length;
+      listEl.innerHTML = '';
+
+      const currentSelectedList = String(state.usuario || '')
+        .split(',')
+        .map(s => s.trim().toUpperCase())
+        .filter(Boolean);
+
+      currentUsuariosLista.forEach((upperUsr) => {
+        const isSelected = currentSelectedList.includes(upperUsr);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = upperUsr;
+        btn.className = 'btn';
+        btn.style.padding = '4px 8px';
+        btn.style.fontSize = '11px';
+        btn.style.borderRadius = '5px';
+        btn.style.borderColor = isSelected ? '#2b82d9' : '#233140';
+        btn.style.backgroundColor = isSelected ? 'rgba(43, 130, 217, 0.3)' : '#16202b';
+        btn.style.color = isSelected ? '#ffffff' : '#cbd5e1';
+        btn.onclick = () => selecionarUsuarioDaLista(upperUsr);
+        listEl.appendChild(btn);
+      });
+
+      box.style.display = 'block';
+    }
+
+    function selecionarUsuarioDaLista(usr) {
+      state.usuario = usr ? String(usr).trim().toUpperCase() : '';
+      saveState();
+      syncForm();
+      renderScene();
+      renderMultiUsuarioSelector(currentUsuariosLista);
+      if (state.usuario) {
+        showToast(`Usuário ${state.usuario} selecionado!`);
+      } else {
+        showToast('Campo Usuário deixado em branco.');
+      }
+    }
+
+    function selecionarTodosUsuariosDaLista() {
+      if (!Array.isArray(currentUsuariosLista) || currentUsuariosLista.length === 0) return;
+      state.usuario = currentUsuariosLista.join(', ');
+      saveState();
+      syncForm();
+      renderScene();
+      renderMultiUsuarioSelector(currentUsuariosLista);
+      showToast(`Todos os ${currentUsuariosLista.length} usuários selecionados!`);
+    }
+
+    function limparFichaInput() {
+      const fichaEl = document.getElementById('fichaInput');
+      if (fichaEl) fichaEl.value = '';
+      renderMultiUsuarioSelector([]);
+    }
+
+    async function preencherPorFicha() {
+      const raw = document.getElementById('fichaInput').value;
+      if (!raw || !raw.trim()) {
+        showToast('Cole o texto da ficha primeiro.');
+        return;
+      }
+
+      const text = raw.replace(/\r/g, '').trim();
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      let temEmailGovValido = false;
+
+      state.ag = '';
+      state.conta = '';
+      state.nome = '';
+      state.cpfcnpj = '';
+      state.situacao = '';
+      state.situacaoCadastral = '';
+      state.usuario = '';
+      state.endereco = '';
+      state.cep = '';
+      state.bairro = '';
+      state.uf = '';
+      state.cidade = '';
+      state.email = '';
+      state.celular = '';
+      renderMultiUsuarioSelector([]);
+
+      const bracketMatch = text.match(/^\s*\[([^|\]]+)\|([^\]]+)\]\s*-\s*\[([^\]]+)\]\s*-\s*\[([^\]]+)\](.*)$/s);
+      if (bracketMatch) {
+        state.ag = bracketMatch[1].trim();
+        state.conta = bracketMatch[2].trim();
+        state.cpfcnpj = formatarCNPJ(bracketMatch[3].trim());
+        state.nome = bracketMatch[4].trim().toUpperCase();
+
+        const rest = bracketMatch[5] || '';
+        const parts = rest.split('|').map(p => p.trim()).filter(Boolean);
+        parts.forEach(part => {
+          const kv = part.match(/^([^:]+):\s*(.+)$/);
+          if (!kv) return;
+          const key = kv[1].trim().toLowerCase();
+          const val = kv[2].trim();
+
+          if (/^usu[aá]rios?$/.test(key)) {
+            const lista = val.split(/[,;]+/).map(u => u.trim()).filter(isValidUsuarioValue);
+            if (lista.length >= 2) {
+              renderMultiUsuarioSelector(lista);
+              state.usuario = lista[0].toUpperCase();
+            } else if (lista.length === 1) {
+              state.usuario = lista[0].toUpperCase();
+            }
+          } else if (/^telefone\s*gov$/.test(key) && val.toLowerCase() !== 'none') {
+            state.celular = formatarTelefone(val);
+          } else if (/^telefone\s*gov\s*final$/.test(key) && !state.celular && val.toLowerCase() !== 'none') {
+            state.celular = val;
+          } else if (/^(telefone|celular|telefone\s*api)$/.test(key) && !state.celular && val.toLowerCase() !== 'none') {
+            state.celular = formatarTelefone(val);
+          } else if (/^e-?mail\s*gov$/.test(key) && isValidEmailValue(val)) {
+            state.email = val;
+            temEmailGovValido = true;
+          } else if (/^e-?mail$/.test(key) && !temEmailGovValido && isValidEmailValue(val)) {
+            state.email = val;
+          }
+        });
+      } else if (lines.some(l => (l.match(/\|/g) || []).length >= 6 && !/^\s*\[/.test(l) && !/:\s*/.test(l.split('|')[0]))) {
+        let headerCols = null;
+        let dataCols = null;
+
+        for (const line of lines) {
+          if ((line.match(/\|/g) || []).length < 6) continue;
+          const cols = line.split('|').map(c => c.trim());
+          if (/^ag[eê]ncia$/i.test(cols[0]) || /^cnpj$/i.test(cols[2])) {
+            headerCols = cols.map(c => c.toUpperCase());
+          } else {
+            dataCols = cols;
+          }
+        }
+
+        if (dataCols) {
+          if (headerCols) {
+            const getCol = (names) => {
+              const idx = headerCols.findIndex(h => names.includes(h));
+              return idx >= 0 && dataCols[idx] ? dataCols[idx] : '';
+            };
+            const agVal = getCol(['AGENCIA', 'AGÊNCIA', 'AG']);
+            const contaVal = getCol(['CONTA']);
+            const cnpjVal = getCol(['CNPJ', 'CPF/CNPJ']);
+            const razaoVal = getCol(['RAZAO SOCIAL', 'RAZÃO SOCIAL', 'EMPRESA', 'NOME EMPRESA']);
+            const telVal = getCol(['TELEFONE', 'CELULAR', 'TELEFONE GOV']);
+            const userVal = getCol(['USUARIO', 'USUÁRIO', 'USUARIOS', 'USUÁRIOS']);
+            const emailVal = getCol(['EMAIL', 'E-MAIL', 'EMAIL GOV', 'E-MAIL GOV']);
+
+            if (agVal) state.ag = agVal;
+            if (contaVal) state.conta = contaVal;
+            if (cnpjVal) state.cpfcnpj = formatarCNPJ(cnpjVal);
+            if (razaoVal) state.nome = razaoVal.toUpperCase();
+            if (telVal && telVal.toLowerCase() !== 'none') state.celular = formatarTelefone(telVal);
+            if (isValidUsuarioValue(userVal)) {
+              const lista = userVal.split(/[,;]+/).map(u => u.trim()).filter(isValidUsuarioValue);
+              if (lista.length >= 2) {
+                renderMultiUsuarioSelector(lista);
+                state.usuario = lista[0].toUpperCase();
+              } else if (lista.length === 1) {
+                state.usuario = lista[0].toUpperCase();
+              }
+            }
+            if (isValidEmailValue(emailVal)) {
+              state.email = emailVal;
+              temEmailGovValido = true;
+            }
+          } else {
+            if (dataCols[0]) state.ag = dataCols[0];
+            if (dataCols[1]) state.conta = dataCols[1];
+            if (dataCols[2]) state.cpfcnpj = formatarCNPJ(dataCols[2]);
+            if (dataCols[3]) state.nome = dataCols[3].toUpperCase();
+            if (dataCols[6] && dataCols[6].toLowerCase() !== 'none') state.celular = formatarTelefone(dataCols[6]);
+            if (isValidUsuarioValue(dataCols[7])) state.usuario = dataCols[7].toUpperCase();
+          }
+        }
+      } else {
+        const knownKeys = [
+          'Empresa',
+          'Raz[aã]o\\s*Social',
+          'CNPJ',
+          'CPF\\s*Usu[aá]rio\\s*Master',
+          'Nome\\s*Usu[aá]rio\\s*Master',
+          'CPF',
+          'Capital\\s*social',
+          'Situa[cç][aã\\s]*o\\s*cadastral',
+          'Situa[cç][aã\\s]*o',
+          'E-?mail\\s*GOV',
+          'E-?mail',
+          'S[oó]cios\\s*encontrados',
+          'Ag[eê\\s]*ncia\\s*\\/\\s*Conta',
+          'Ag[eê\\s]*ncia',
+          'Conta',
+          'S[oó]cios',
+          'U\\s*s\\s*u\\s*[aá\\uFFFD?\\s]*r\\s*i\\s*o\\s*s?',
+          'Telefone\\s*GOV\\s*final',
+          'Telefone\\s*GOV',
+          'Telefone\\s*API',
+          'Telefone',
+          'Celular',
+          'Renda',
+          'Data\\s*de\\s*nascimento'
+        ];
+        const stopLookahead = `(?=\\n\\s*(?:${knownKeys.join('|')})\\s*(?::|[•·\\-=])|$)`;
+
+        const extractField = (labelPattern) => {
+          const re = new RegExp(`(?:^|\\n)\\s*(?:${labelPattern})\\s*(?::|[•·\\-=])\\s*([\\s\\S]*?)${stopLookahead}`, 'i');
+          const m = text.match(re);
+          if (!m) return '';
+          return m[1].replace(/\s*\n\s*/g, ' ').replace(/\s*@\s*/g, '@').replace(/\.\s*-\s*/g, '.').trim();
+        };
+
+        const empresa = extractField('Empresa|Raz[aã?o\\s*Social');
+        if (empresa) {
+          state.nome = empresa.toUpperCase();
+        }
+
+        const cnpjRaw = extractField('CNPJ');
+        if (cnpjRaw) {
+          state.cpfcnpj = formatarCNPJ(cnpjRaw);
+        }
+
+        const sitCad = extractField('Situa[cç][aã?\\s]*o\\s*cadastral');
+        if (sitCad) {
+          const up = sitCad.toUpperCase();
+          state.situacaoCadastral = up;
+          if (['ATIVA', 'INATIVA', 'SUSPENSA', 'BLOQUEADA'].includes(up)) {
+            state.situacao = up;
+          }
+        }
+
+        const agContaCombo = text.match(/Ag[eê?\s]*ncia\s*\/\s*Conta\s*:\s*([^\n|]+)\|\s*([^\n]+)/i);
+        if (agContaCombo) {
+          state.ag = agContaCombo[1].trim();
+          state.conta = agContaCombo[2].trim();
+        } else {
+          const agLineMatch = text.match(/Ag[eê?\s]*ncia\s*:\s*([^\n/]+)(?:\/\s*Conta\s*:\s*([^\n]+))?/i);
+          if (agLineMatch) {
+            if (agLineMatch[1] && agLineMatch[1].trim()) {
+              state.ag = agLineMatch[1].trim();
+            }
+            if (agLineMatch[2] && agLineMatch[2].trim()) {
+              state.conta = agLineMatch[2].trim();
+            }
+          }
+          if (!agLineMatch || !agLineMatch[2]) {
+            const contaMatch = text.match(/(?:^|\n|\/)\s*Conta\s*:\s*([^\n]+)/i);
+            if (contaMatch && contaMatch[1].trim()) {
+              state.conta = contaMatch[1].trim();
+            }
+          }
+        }
+
+        let usuarioVal = extractField('U\\s*s\\s*u\\s*[aá\\uFFFD?\\s]*r\\s*i\\s*o\\s*s?');
+        if (!usuarioVal) {
+          const fallbackUserMatch = text.match(/(?:^|\n)\s*U[^\n:]*u[^\n:]*r[^\n:]*o[^\n:]*:\s*([^\r\n]+)/i);
+          if (fallbackUserMatch && fallbackUserMatch[1]) {
+            usuarioVal = fallbackUserMatch[1].trim();
+          }
+        }
+        if (/^(?:telefone|celular|e-?mail|cpf|nome|renda|data)\b/i.test(usuarioVal) || usuarioVal.includes(':')) {
+          usuarioVal = '';
+        }
+        if (isValidUsuarioValue(usuarioVal)) {
+          const usuariosLista = usuarioVal
+            .split(/[,;]+/)
+            .map(u => u.trim())
+            .filter(isValidUsuarioValue);
+
+          if (usuariosLista.length >= 2) {
+            renderMultiUsuarioSelector(usuariosLista);
+            state.usuario = usuariosLista[0].toUpperCase();
+          } else if (usuariosLista.length === 1) {
+            state.usuario = usuariosLista[0].toUpperCase();
+          }
+        }
+
+        const telGov = extractField('Telefone\\s*GOV(?!\\s*final)');
+        const telApi = extractField('Telefone\\s*API');
+        const telGovFinal = extractField('Telefone\\s*GOV\\s*final');
+        const telGeral = extractField('Telefone|Celular');
+        if (telGov && telGov.toLowerCase() !== 'none') {
+          state.celular = formatarTelefone(telGov);
+        } else if (telApi && telApi.toLowerCase() !== 'none') {
+          state.celular = formatarTelefone(telApi);
+        } else if (telGeral && telGeral.toLowerCase() !== 'none') {
+          state.celular = formatarTelefone(telGeral);
+        } else if (telGovFinal && telGovFinal.toLowerCase() !== 'none') {
+          state.celular = telGovFinal;
+        }
+
+        const emailGovMatch = text.match(/E-?mail\s*GOV\s*(?::|[•·\-=])\s*([\s\S]*?)(?=\n\s*(?:Telefone|Usu[aá]rio|CPF|Nome|Empresa|CNPJ|Ag[eê]ncia|Conta|$))/i);
+        const emailGov = emailGovMatch ? emailGovMatch[1].replace(/\s*\n\s*/g, '').replace(/\s*@\s*/g, '@').trim() : extractField('E-?mail\\s*GOV');
+
+        if (isValidEmailValue(emailGov)) {
+          state.email = emailGov;
+          temEmailGovValido = true;
+        } else {
+          state.email = '';
+        }
+      }
+
+      saveState();
+      syncForm();
+      renderScene();
+
+      if (state.cpfcnpj) {
+        const emailAntesDaApi = temEmailGovValido ? state.email : '';
+        const buscarEmailDoCnpj = !temEmailGovValido;
+        await consultarCNPJOnline(state.cpfcnpj, buscarEmailDoCnpj);
+        if (temEmailGovValido && emailAntesDaApi) {
+          state.email = emailAntesDaApi;
+          saveState();
+          syncForm();
+          renderScene();
+        }
+      } else {
+        showToast('Ficha importada com sucesso!');
+      }
+    }
+
+    function syncForm() {
+      document.querySelectorAll('[data-field]').forEach(el => {
+        const field = el.getAttribute('data-field');
+        if (state[field] !== undefined) {
+          if (el.tagName === 'SELECT') {
+            const val = String(state[field] || '');
+            const hasOption = Array.from(el.options).some(opt => opt.value === val);
+            if (!hasOption && val) {
+              const dynamicOpt = document.createElement('option');
+              dynamicOpt.value = val;
+              dynamicOpt.textContent = val;
+              el.appendChild(dynamicOpt);
+            }
+          }
+          el.value = state[field];
+        }
+      });
+      renderResponsaveisForm();
+      updatePaginationUI();
+    }
+
+    function renderResponsaveisForm() {
+      const container = document.getElementById('responsaveisContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      (state.responsaveis || []).forEach((resp, idx) => {
+        const card = document.createElement('div');
+        card.className = 'resp-card';
+        card.innerHTML = `
+          <div class="resp-header">
+            <span>Responsável ${idx + 1}</span>
+            <button type="button" onclick="removeResponsavel(${idx})" class="btn btn-danger">Remover</button>
+          </div>
+          <div class="grid-2">
+            <div>
+              <label class="field-label"><span>Cargo</span></label>
+              <input type="text" value="${escapeHtml(resp.cargo || '')}" oninput="updateResponsavel(${idx}, 'cargo', this.value)" class="form-input" placeholder="Administrador">
+            </div>
+            <div>
+              <label class="field-label"><span>Nome</span></label>
+              <input type="text" value="${escapeHtml(resp.nome || '')}" oninput="updateResponsavel(${idx}, 'nome', this.value)" class="form-input" placeholder="Nome completo">
+            </div>
+          </div>
+          <div class="grid-2">
+            <div>
+              <label class="field-label"><span>CPF</span></label>
+              <input type="text" maxlength="14" value="${escapeHtml(formatarCpfLimite(resp.cpf || ''))}" oninput="updateResponsavel(${idx}, 'cpf', this.value, this)" onblur="formatResponsavelField(${idx}, 'cpf', this)" class="form-input" placeholder="000.000.000-00">
+            </div>
+            <div>
+              <label class="field-label"><span>Contato</span></label>
+              <input type="text" maxlength="15" value="${escapeHtml(formatarContatoLimite(resp.contato || ''))}" oninput="updateResponsavel(${idx}, 'contato', this.value, this)" onblur="formatResponsavelField(${idx}, 'contato', this)" class="form-input" placeholder="(00) 00000-0000">
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function formatarCpfLimite(val) {
+      const d = String(val || '').replace(/\D/g, '').slice(0, 11);
+      if (d.length <= 3) return d;
+      if (d.length <= 6) return d.replace(/^(\d{3})(\d+)$/, '$1.$2');
+      if (d.length <= 9) return d.replace(/^(\d{3})(\d{3})(\d+)$/, '$1.$2.$3');
+      return d.replace(/^(\d{3})(\d{3})(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
+    }
+
+    function formatarContatoLimite(val) {
+      const d = String(val || '').replace(/\D/g, '').slice(0, 11);
+      if (d.length === 0) return '';
+      if (d.length <= 2) return `(${d}`;
+      if (d.length <= 6) return d.replace(/^(\d{2})(\d+)$/, '($1) $2');
+      if (d.length <= 10) return d.replace(/^(\d{2})(\d{4})(\d+)$/, '($1) $2-$3');
+      return d.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+    }
+
+    function formatResponsavelField(idx, key, inputEl) {
+      if (!state.responsaveis || !state.responsaveis[idx]) return;
+      const raw = String(state.responsaveis[idx][key] || '').trim();
+      if (!raw) return;
+
+      const formatted = key === 'cpf' ? formatarCpfLimite(raw) : formatarContatoLimite(raw);
+      state.responsaveis[idx][key] = formatted;
+      if (inputEl) inputEl.value = formatted;
+      saveState();
+      renderScene();
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function addResponsavel() {
+      if (!Array.isArray(state.responsaveis)) {
+        state.responsaveis = [];
+      }
+      state.responsaveis.push({
+        cargo: 'ADMINISTRADOR',
+        nome: '',
+        cpf: '',
+        contato: ''
+      });
+      saveState();
+      renderResponsaveisForm();
+      updatePaginationUI();
+      renderScene();
+    }
+
+    function removeResponsavel(idx) {
+      state.responsaveis.splice(idx, 1);
+      saveState();
+      renderResponsaveisForm();
+      updatePaginationUI();
+      renderScene();
+    }
+
+    function updateResponsavel(idx, key, val, inputEl = null) {
+      if (state.responsaveis[idx]) {
+        let nextVal = val;
+        if (key === 'cpf') {
+          nextVal = formatarCpfLimite(val);
+          if (inputEl && inputEl.value !== nextVal) inputEl.value = nextVal;
+        } else if (key === 'contato') {
+          nextVal = formatarContatoLimite(val);
+          if (inputEl && inputEl.value !== nextVal) inputEl.value = nextVal;
+        }
+        state.responsaveis[idx][key] = nextVal;
+        saveState();
+        renderScene();
+      }
+    }
+
+    function setNowDateTime() {
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, '0');
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const yyyy = now.getFullYear();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const min = String(now.getMinutes()).padStart(2, '0');
+      state.dataHora = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+      saveState();
+      syncForm();
+      renderScene();
+    }
+
+    function limparCampos() {
+      state = JSON.parse(JSON.stringify(ESTADO_LIMPO_PADRAO));
+      currentPage = 0;
+      renderMultiUsuarioSelector([]);
+      setNowDateTime();
+      saveState();
+      syncForm();
+      renderScene();
+      showToast('Campos limpos.');
+    }
+
+    function restaurarExemplo() {
+      state = JSON.parse(JSON.stringify(EXEMPLO_PADRAO));
+      currentPage = 0;
+      renderMultiUsuarioSelector([]);
+      saveState();
+      syncForm();
+      renderScene();
+      showToast('Exemplo padrão restaurado.');
+    }
+
+    document.querySelectorAll('[data-field]').forEach(el => {
+      const handler = () => {
+        const field = el.getAttribute('data-field');
+        state[field] = el.value;
+        if (field === 'pag') {
+          updatePaginationUI();
+        }
+        if (field === 'usuario') {
+          renderMultiUsuarioSelector(currentUsuariosLista);
+        }
+        saveState();
+        renderScene();
+      };
+      el.addEventListener('input', handler);
+      el.addEventListener('change', handler);
+    });
+
+    setInterval(() => {
+      cursorVisible = !cursorVisible;
+      renderScene();
+    }, 650);
+
+    window.addEventListener('load', () => {
+      setNowDateTime();
+      syncForm();
+      initMonitorPhoto();
+    });
+  </script>
+</body>
+</html>
