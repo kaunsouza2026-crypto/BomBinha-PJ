@@ -494,29 +494,38 @@
             <div>
               <span class="text-[11px] text-slate-400">SITUAÇÃO:</span>
               <select data-mfield="situacao" class="term-select ok w-full">
-                <option value="">—</option>
-                <option value="ATIVA">ATIVA</option>
-                <option value="INATIVA">INATIVA</option>
-                <option value="SUSPENSA">SUSPENSA</option>
-                <option value="BAIXADA">BAIXADA</option>
+                <option value="" style="background-color:#08111e; color:#94a3b8;">—</option>
+                <option value="ATIVA" style="background-color:#08111e; color:#38bdf8;">ATIVA</option>
+                <option value="INATIVA" style="background-color:#08111e; color:#fb7185;">INATIVA</option>
+                <option value="SUSPENSA" style="background-color:#08111e; color:#fb923c;">SUSPENSA</option>
+                <option value="BAIXADA" style="background-color:#08111e; color:#f43f5e;">BAIXADA</option>
               </select>
             </div>
             <div>
               <span class="text-[11px] text-slate-400">SITUAÇÃO CADASTRAL:</span>
               <select data-mfield="situacaoCadastral" class="term-select w-full">
-                <option value="">—</option>
-                <option value="PENDENTE">PENDENTE</option>
-                <option value="REGULAR">REGULAR</option>
-                <option value="EM ANÁLISE">EM ANÁLISE</option>
-                <option value="APROVADO">APROVADO</option>
+                <option value="" style="background-color:#08111e; color:#94a3b8;">—</option>
+                <option value="PENDENTE" style="background-color:#08111e; color:#fb7185;">PENDENTE</option>
+                <option value="REGULAR" style="background-color:#08111e; color:#38bdf8;">REGULAR</option>
+                <option value="EM ANÁLISE" style="background-color:#08111e; color:#fbbf24;">EM ANÁLISE</option>
+                <option value="APROVADO" style="background-color:#08111e; color:#34d399;">APROVADO</option>
               </select>
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <span class="text-[11px] text-slate-400">MÓDULO TOPAZ:</span>
-              <input type="text" data-mfield="moduloTopaz" class="term-input text-rose-400" />
+              <span class="text-[11px] text-slate-400">CERTIFICADO:</span>
+              <select data-mfield="moduloTopaz" class="term-select w-full">
+                <option value="" style="background-color:#08111e; color:#94a3b8;">—</option>
+                <option value="ATIVA" style="background-color:#08111e; color:#38bdf8;">ATIVA</option>
+                <option value="PENDENTE" style="background-color:#08111e; color:#fb7185;">PENDENTE</option>
+                <option value="EXPIRA EM 1 DIA" style="background-color:#08111e; color:#f43f5e;">EXPIRA EM 1 DIA</option>
+                <option value="EXPIRA EM 2 DIAS" style="background-color:#08111e; color:#fb923c;">EXPIRA EM 2 DIAS</option>
+                <option value="EXPIRA EM 3 DIAS" style="background-color:#08111e; color:#fbbf24;">EXPIRA EM 3 DIAS</option>
+                <option value="EXPIRA EM 15 DIAS" style="background-color:#08111e; color:#facc15;">EXPIRA EM 15 DIAS</option>
+                <option value="EXPIRA EM 30 DIAS" style="background-color:#08111e; color:#34d399;">EXPIRA EM 30 DIAS</option>
+              </select>
             </div>
             <div>
               <span class="text-[11px] text-slate-400">USUÁRIO (OPCIONAL):</span>
@@ -1226,7 +1235,7 @@
               <div class="border border-slate-600 p-4">
                 <!-- Topo Logo + Título -->
                 <div class="flex items-center gap-4 border-b border-slate-600 pb-4 mb-4">
-                  <img id="agLogoImg" src="seu-repositorio/assets/logos/logo.png" alt="Logo" class="w-16 h-16 object-contain" onerror="handleAgLogoFallback(this)" />
+                  <img id="agLogoImg" src="seu-repositorio/assets/logo.png" alt="Logo" class="w-16 h-16 object-contain" onerror="handleAgLogoFallback(this)" />
                   <div id="agFallbackBox" style="display:none;" class="w-16 h-16 border border-slate-400 flex-col overflow-hidden shrink-0">
                     <div class="bg-[#B22222] text-white text-[9px] font-bold text-center py-0.5">AGENDA</div>
                     <div class="grid grid-cols-3 gap-1 p-1.5 flex-1 bg-white">
@@ -1419,7 +1428,7 @@
             <!-- PÁGINA 1 -->
             <div class="a4-sheet text-black">
               <div class="flex items-center gap-4 pb-3">
-                <img id="pvBouLogoPolicia" alt="Brasão Polícia" class="w-20 h-24 object-contain shrink-0" onerror="this.style.display='none'; document.getElementById('pvBouBrasaoFallback').style.display='flex';" />
+                <img id="pvBouLogoPolicia" crossorigin="anonymous" alt="Brasão Polícia" class="w-20 h-24 object-contain shrink-0" onerror="handleBouAssetFallback(this)" />
                 <div id="pvBouBrasaoFallback" style="display:none;" class="w-20 h-24 border border-slate-400 rounded flex-col items-center justify-center text-center p-1 shrink-0 text-[9px] font-bold text-slate-700">
                   <span>BRASÃO</span>
                   <span>POLÍCIA CIVIL</span>
@@ -1467,7 +1476,7 @@
                   <tr><td class="font-bold pr-4 py-0.5">CPF:</td><td id="pvBouVitimaCpf">000.000.000-00</td></tr>
                   <tr><td class="font-bold pr-4 py-0.5">CELULAR:</td><td id="pvBouVitimaCelular">(00) 00000-0000</td></tr>
                 </table>
-                <img id="pvBouLogoBanco" alt="Logo Banco" class="max-w-[140px] max-h-[42px] object-contain" onerror="this.style.display='none'" />
+                <img id="pvBouLogoBanco" crossorigin="anonymous" alt="Logo Banco" class="max-w-[140px] max-h-[42px] object-contain" onerror="handleBouAssetFallback(this)" />
               </div>
 
               <div class="border-t border-black my-3"></div>
@@ -1487,7 +1496,7 @@
             <div class="a4-sheet text-black !min-h-[340px]">
               <div class="text-[11px] mb-10">Protocolo Administrativo nº: 048640-1023/2026</div>
               <div class="flex flex-col items-center justify-center mt-6">
-                <img id="pvBouAssinatura" alt="Assinatura" class="h-12 object-contain mb-1" onerror="this.style.display='none'" />
+                <img id="pvBouAssinatura" crossorigin="anonymous" alt="Assinatura" class="h-12 object-contain mb-1" onerror="handleBouAssetFallback(this)" />
                 <div class="w-60 border-t border-black mb-2"></div>
                 <div id="pvBouInvestigador" class="font-bold text-[11px]">CARLOS EDUARDO MENDES OLIVEIRA</div>
                 <div id="pvBouInvestigadorCargo" class="text-[9.5px] text-slate-700">Investigador Policial - 112.045-1</div>
@@ -1623,6 +1632,21 @@
         imgEl.style.display = 'none';
         const fb = document.getElementById('agFallbackBox');
         if (fb) fb.style.display = 'flex';
+      }
+    }
+
+    function handleBouAssetFallback(imgEl) {
+      const relPath = imgEl.getAttribute('data-rel-path');
+      const triedRaw = imgEl.getAttribute('data-tried-raw') === '1';
+      if (relPath && !triedRaw) {
+        imgEl.setAttribute('data-tried-raw', '1');
+        imgEl.src = RAW_REPO_ASSETS + relPath;
+      } else {
+        imgEl.style.display = 'none';
+        if (imgEl.id === 'pvBouLogoPolicia') {
+          const fb = document.getElementById('pvBouBrasaoFallback');
+          if (fb) fb.style.display = 'flex';
+        }
       }
     }
 
@@ -1817,7 +1841,7 @@
       cidade: '',
       situacao: '',
       situacaoCadastral: '',
-      moduloTopaz: 'INATIVO',
+      moduloTopaz: '',
       usuario: '',
       celular: '',
       email: '',
@@ -1841,7 +1865,7 @@
       cidade: '',
       situacao: 'ATIVA',
       situacaoCadastral: 'PENDENTE',
-      moduloTopaz: 'INATIVO',
+      moduloTopaz: 'PENDENTE',
       usuario: 'LFR00477',
       celular: '(44) 99976-2525',
       email: 'va**@ho*',
@@ -1971,6 +1995,33 @@
       return ['PENDENTE', 'INATIVO', 'INATIVA', 'BAIXADA', 'EM ANÁLISE', 'EXPIRADO', 'VENCIDO', 'IRREGULAR', 'CANCELADA', 'BLOQUEADA', 'SUSPENSA', '****'].includes(upper);
     }
 
+    function getCertificadoColorInfo(val) {
+      const upper = String(val || '').trim().toUpperCase();
+      if (upper === 'ATIVA' || upper === 'REGULAR') {
+        return { canvasColor: sampledTextColor, cssColor: '#38bdf8', shadow: 'rgba(130, 185, 245, 0.34)' };
+      }
+      if (upper === 'APROVADO' || upper === 'EXPIRA EM 30 DIAS') {
+        return { canvasColor: '#34d399', cssColor: '#34d399', shadow: 'rgba(52, 211, 153, 0.34)' };
+      }
+      if (upper === 'PENDENTE' || upper === 'INATIVA' || upper === 'BAIXADA' || upper === 'EXPIRA EM 1 DIA') {
+        return { canvasColor: '#e03c4d', cssColor: '#fb7185', shadow: 'rgba(224, 60, 77, 0.38)' };
+      }
+      if (upper === 'SUSPENSA' || upper === 'EXPIRA EM 2 DIAS') {
+        return { canvasColor: '#f97316', cssColor: '#fb923c', shadow: 'rgba(249, 115, 22, 0.36)' };
+      }
+      if (upper === 'EM ANÁLISE' || upper === 'EXPIRA EM 3 DIAS') {
+        return { canvasColor: '#f59e0b', cssColor: '#fbbf24', shadow: 'rgba(245, 158, 11, 0.36)' };
+      }
+      if (upper === 'EXPIRA EM 15 DIAS') {
+        return { canvasColor: '#eab308', cssColor: '#facc15', shadow: 'rgba(234, 179, 8, 0.34)' };
+      }
+      return {
+        canvasColor: isAlertStatus(upper) ? '#e03c4d' : sampledTextColor,
+        cssColor: isAlertStatus(upper) ? '#fb7185' : '#38bdf8',
+        shadow: isAlertStatus(upper) ? 'rgba(224, 60, 77, 0.36)' : 'rgba(130, 185, 245, 0.34)'
+      };
+    }
+
     function getTotalMonitorPages() {
       return Math.max(1, Math.ceil((mState.responsaveis ? mState.responsaveis.length : 0) / ROWS_PER_PAGE));
     }
@@ -2072,18 +2123,19 @@
       const sitLabel = 'SITUACAO: ';
       const sitVal = valOrDash(mState.situacao).toUpperCase();
       drawTermText(flatCtx, sitLabel, leftX, 326, COLOR_NORMAL);
-      drawTermText(flatCtx, sitVal, leftX + flatCtx.measureText(sitLabel).width, 326, isAlertStatus(sitVal) ? COLOR_ALERT : COLOR_NORMAL);
+      drawTermText(flatCtx, sitVal, leftX + flatCtx.measureText(sitLabel).width, 326, getCertificadoColorInfo(sitVal).canvasColor);
       drawTermText(flatCtx, `CIDADE: ${valOrDash(mState.cidade).toUpperCase()}`, 880, 326, COLOR_NORMAL);
 
       const sitCadLabel = 'SITUACAO CADASTRAL: ';
       const sitCadVal = valOrDash(mState.situacaoCadastral).toUpperCase();
       drawTermText(flatCtx, sitCadLabel, leftX, 360, COLOR_NORMAL);
-      drawTermText(flatCtx, sitCadVal, leftX + flatCtx.measureText(sitCadLabel).width, 360, isAlertStatus(sitCadVal) ? COLOR_ALERT : COLOR_NORMAL);
+      drawTermText(flatCtx, sitCadVal, leftX + flatCtx.measureText(sitCadLabel).width, 360, getCertificadoColorInfo(sitCadVal).canvasColor);
 
-      const topazLabel = 'MODULO TOPAZ: ';
+      const topazLabel = 'CERTIFICADO: ';
       const topazVal = valOrDash(mState.moduloTopaz).toUpperCase();
+      const certColorInfo = getCertificadoColorInfo(topazVal);
       drawTermText(flatCtx, topazLabel, leftX, 394, COLOR_NORMAL);
-      drawTermText(flatCtx, topazVal, leftX + flatCtx.measureText(topazLabel).width, 394, isAlertStatus(topazVal) ? COLOR_ALERT : COLOR_NORMAL);
+      drawTermText(flatCtx, topazVal, leftX + flatCtx.measureText(topazLabel).width, 394, certColorInfo.canvasColor);
 
       const usuarioLimpo = isValidUsuarioValue(mState.usuario) ? String(mState.usuario).trim().toUpperCase() : '';
       if (usuarioLimpo) {
@@ -2307,6 +2359,9 @@
               opt.value = val; opt.textContent = val;
               el.appendChild(opt);
             }
+            if (f === 'moduloTopaz' || f === 'situacaoCadastral' || f === 'situacao') {
+              el.style.color = getCertificadoColorInfo(val).cssColor;
+            }
           }
           el.value = mState[f];
         }
@@ -2452,7 +2507,7 @@
       let temEmailGovValido = false;
 
       Object.assign(mState, {
-        ag: '', conta: '', nome: '', cpfcnpj: '', situacao: '', situacaoCadastral: '',
+        ag: '', conta: '', nome: '', cpfcnpj: '',
         usuario: '', endereco: '', cep: '', bairro: '', uf: '', cidade: '', email: '', celular: ''
       });
       renderMultiUsuarioSelector([]);
@@ -2562,8 +2617,16 @@
     }
 
     function limparMonitorCampos() {
+      const keptSituacao = mState.situacao || '';
+      const keptSituacaoCadastral = mState.situacaoCadastral || '';
+      const keptCertificado = mState.moduloTopaz || '';
       mState = JSON.parse(JSON.stringify(ESTADO_LIMPO_MONITOR));
+      mState.situacao = keptSituacao;
+      mState.situacaoCadastral = keptSituacaoCadastral;
+      mState.moduloTopaz = keptCertificado;
       currentMonitorPage = 0;
+      const fichaEl = document.getElementById('fichaMonitorInput');
+      if (fichaEl) fichaEl.value = '';
       renderMultiUsuarioSelector([]);
       setNowMonitor();
       showToast('Campos do Monitor limpos.');
@@ -2597,7 +2660,7 @@
         `AG: ${valOrDash(mState.ag)} | PRODUTO: ${valOrDash(mState.produto)} | CONTA: ${valOrDash(mState.conta)} | PAG: ${getFormattedMonitorPage()}`,
         `RAZÃO SOCIAL: ${valOrDash(mState.nome).toUpperCase()} | CPF/CNPJ: ${valOrDash(mState.cpfcnpj)}`,
         `ENDERECO: ${valOrDash(mState.endereco).toUpperCase()} | CEP: ${valOrDash(mState.cep)} | CIDADE: ${valOrDash(mState.cidade).toUpperCase()} - ${valOrDash(mState.uf).toUpperCase()}`,
-        `SITUACAO: ${valOrDash(mState.situacao).toUpperCase()} | SITUACAO CADASTRAL: ${valOrDash(mState.situacaoCadastral).toUpperCase()}`,
+        `SITUACAO: ${valOrDash(mState.situacao).toUpperCase()} | SITUACAO CADASTRAL: ${valOrDash(mState.situacaoCadastral).toUpperCase()} | CERTIFICADO: ${valOrDash(mState.moduloTopaz).toUpperCase()}`,
         ...(isValidUsuarioValue(mState.usuario) ? [`USUARIO: ${mState.usuario.trim().toUpperCase()}`] : []),
         `CELULAR: ${valOrDash(mState.celular)}`,
         ...(isValidEmailValue(mState.email) ? [`EMAIL: ${mState.email.trim()}`] : [])
@@ -2619,6 +2682,11 @@
       const handler = () => {
         const f = el.getAttribute('data-mfield');
         mState[f] = el.value;
+        if (el.tagName === 'SELECT') {
+          if (f === 'moduloTopaz' || f === 'situacaoCadastral' || f === 'situacao') {
+            el.style.color = getCertificadoColorInfo(el.value).cssColor;
+          }
+        }
         if (f === 'pag') updateMonitorPaginationUI();
         if (f === 'usuario') renderMultiUsuarioSelector(currentUsuariosLista);
         saveMonitorState();
@@ -3376,7 +3444,7 @@
     }
 
     // =========================================================================
-    // 4. ABA 4: CONFIRMAÇÃO DE AGENDAMENTO (assets/logos/logo.png + jsPDF)
+    // 4. ABA 4: CONFIRMAÇÃO DE AGENDAMENTO (assets/logo.png + jsPDF)
     // =========================================================================
     function formatarTextoAg(v) {
       const s = String(v || '').trim();
@@ -3794,21 +3862,30 @@
 
       const imgPol = document.getElementById('pvBouLogoPolicia');
       const fbPol = document.getElementById('pvBouBrasaoFallback');
+      const relPol = `assets/logo_estados/${uf}/logo_policia.png`;
       imgPol.style.display = 'block';
+      imgPol.setAttribute('data-rel-path', relPol);
+      imgPol.setAttribute('data-tried-raw', '0');
       fbPol.style.display = 'none';
-      imgPol.src = `${ASSET_BASE}assets/logo_estados/${uf}/logo_policia.png`;
+      imgPol.src = ASSET_BASE + relPol;
 
       const imgBanco = document.getElementById('pvBouLogoBanco');
       if (logoArq) {
+        const relBanco = `assets/logo_banco/${logoArq}`;
         imgBanco.style.display = 'block';
-        imgBanco.src = `${ASSET_BASE}assets/logo_banco/${logoArq}`;
+        imgBanco.setAttribute('data-rel-path', relBanco);
+        imgBanco.setAttribute('data-tried-raw', '0');
+        imgBanco.src = ASSET_BASE + relBanco;
       } else {
         imgBanco.style.display = 'none';
       }
 
       const imgAss = document.getElementById('pvBouAssinatura');
+      const relAss = `assets/logo_estados/${uf}/assinatura.png`;
       imgAss.style.display = 'block';
-      imgAss.src = `${ASSET_BASE}assets/logo_estados/${uf}/assinatura.png`;
+      imgAss.setAttribute('data-rel-path', relAss);
+      imgAss.setAttribute('data-tried-raw', '0');
+      imgAss.src = ASSET_BASE + relAss;
     }
 
     function limparBoletim() {
@@ -3913,9 +3990,10 @@
       doc.text(vCpf, 90.0, yCpf + 10);
       doc.text(vCel, 90.0, yCel + 10);
 
-      const bancoUrl = BANCOS_BOU[bancoNome] ? imageElementToDataURL(document.getElementById('pvBouLogoBanco')) : null;
+      const imgBancoEl = document.getElementById('pvBouLogoBanco');
+      const bancoUrl = BANCOS_BOU[bancoNome] ? imageElementToDataURL(imgBancoEl) : null;
       if (bancoUrl) {
-        try { doc.addImage(bancoUrl, 'PNG', LINHA_X1 - 120, yNome - 2, 120, 38); } catch (e) {}
+        addImageFitAspect(doc, bancoUrl, imgBancoEl, LINHA_X1 - 120, yNome - 4, 120, 44, 'right');
       }
 
       drawLinha(yCel + 52, false);
