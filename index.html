@@ -345,7 +345,7 @@
           <span>🏦 Confirmação de Agendamento</span>
         </button>
         <button type="button" id="tabBtn-boletim" onclick="switchMainTab('boletim')" class="nav-tab-btn flex-1 min-w-[135px] py-3 px-2.5 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
-          <span>🛡️ Boletim (BOU)</span>
+          <span>🛡️ Boletim</span>
         </button>
         <button type="button" id="tabBtn-cnpj" onclick="switchMainTab('cnpj')" class="nav-tab-btn flex-1 min-w-[130px] py-3 px-2.5 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
           <span>🔍 Consulta CNPJ</span>
@@ -1405,7 +1405,7 @@
       <section class="lg:col-span-7 panel-card p-4 sm:p-5 flex flex-col gap-4">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h2 class="text-base sm:text-lg font-bold text-slate-900">Visualização do Boletim (BOU)</h2>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">Visualização do Boletim</h2>
             <p class="text-xs text-slate-500">Preview em tempo real das 2 páginas A4</p>
           </div>
           <div class="flex items-center gap-2">
@@ -4038,7 +4038,7 @@
 
       const nomeBancoArq = bancoNome !== 'Sem Logo' ? bancoNome : 'Geral';
       doc.save(`Boletim ${nomeBancoArq}.pdf`);
-      showToast('PDF do Boletim (BOU) baixado!');
+      showToast('PDF do Boletim baixado!');
     }
 
     // =========================================================================
